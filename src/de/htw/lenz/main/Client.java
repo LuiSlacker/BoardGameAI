@@ -14,6 +14,8 @@ public class Client {
 	private int networkLatencyMillis;
 	private int timeLimitSeconds;
 	private int playerNumber;
+	
+	private int[][][] pitch = new int[7][13][3];
 
 	public Client(String clientName) {
 		try {
@@ -22,12 +24,22 @@ public class Client {
 			timeLimitSeconds = networkClient.getTimeLimitInSeconds();
 			playerNumber = networkClient.getMyPlayerNumber();
 			
+			initializePitch();
 			listenForMoves();
 	    } catch (IOException e) {
 	        throw new RuntimeException("", e);
 	    }
 	}
 	
+	
+	private void initializePitch() {
+		// mark corners
+		for (int i = 0; i < 3; i++) {
+			this.pitch[0][0][i] = Integer.MIN_VALUE;
+			this.pitch[6][0][i] = Integer.MIN_VALUE;
+			this.pitch[6][12][i] = Integer.MIN_VALUE;
+		}
+	}
 	private void listenForMoves() {
 		while(true) {
 			Move receiveMove;
