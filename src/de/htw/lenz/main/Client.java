@@ -26,7 +26,7 @@ public class Client {
 
 	public Client(String clientName) {
 		try {
-			networkClient = new NetworkClient(null, clientName, ImageIO.read(new File("brain-2-xxl.png")));
+			networkClient = new NetworkClient(null, clientName, ImageIO.read(new File("glasses.png")));
 			networkLatencyMillis = networkClient.getExpectedNetworkLatencyInMilliseconds();
 			timeLimitSeconds = networkClient.getTimeLimitInSeconds();
 			playerNumber = networkClient.getMyPlayerNumber();
@@ -81,6 +81,8 @@ public class Client {
 	
 	/**
 	 * handles one move of a chip
+	 * NOTE: No validation of move necessary since server only sends valid moves
+	 * 
 	 * @param move the move to be taken care of
 	 */
 	private void moveChip(Move move) {
@@ -92,7 +94,6 @@ public class Client {
 	
 	/**
 	 * removes the chip which is on top of the "stack" of a field and returns the corresponding player
-	 * NOTE: No validation of move necessary since server only sends valid moves
 	 * 
 	 * @param index index of the field (internal array representation) to take the chip from
 	 * @return the player of the top most chip of the "stack" of that field
@@ -131,8 +132,11 @@ public class Client {
                 moveChip(receiveMove);
                 printPitch();
             }
-            //berechne tollen Zug
+			
+            // calculate move
 			if(playerNumber == 0) networkClient.sendMove(new Move(0, 1, 3, 2));
+			if(playerNumber == 1) networkClient.sendMove(new Move(0, 5, 1, 4));
+			if(playerNumber == 2) networkClient.sendMove(new Move(10, 5, 7, 5));
 		}
 	}
 
