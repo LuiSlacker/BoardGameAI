@@ -2,8 +2,7 @@ package de.htw.lenz.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -40,10 +39,10 @@ public class Client {
 			  pitch.moveChip(receiveMove);
             }
 			
-            // calculate move
-			if(playerNumber == 0) networkClient.sendMove(new Move(0, 1, 3, 2));
-			if(playerNumber == 1) networkClient.sendMove(new Move(0, 5, 1, 4));
-			if(playerNumber == 2) networkClient.sendMove(new Move(10, 5, 7, 5));
+			// calculate move
+			List<Move> possibleMoves = pitch.getPossibleMoves(playerNumber + 1);
+			System.out.println(possibleMoves);
+			networkClient.sendMove(possibleMoves.get((int)(Math.random() * possibleMoves.size())));
 		}
 	}
 
