@@ -42,7 +42,9 @@ public class Client {
 			// calculate move
 			List<Move> possibleMoves = pitch.getPossibleMoves(playerNumber + 1);
 			System.out.println(possibleMoves);
-			networkClient.sendMove(possibleMoves.get((int)(Math.random() * possibleMoves.size())));
+			Move m = possibleMoves.get((int)(Math.random() * possibleMoves.size()));
+			System.out.println(m);
+			networkClient.sendMove(m);
 		}
 	}
 

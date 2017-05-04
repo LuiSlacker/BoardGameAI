@@ -2,7 +2,9 @@ package de.htw.lenz.main;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lenz.htw.bogapr.Move;
 
@@ -59,16 +61,17 @@ public class Pitch {
       return (int) (x + Math.pow(y, 2) - 1);
   }
   
+//  deprecated - left for report (n*n+2)
 //  private static int rowOffset(int rowNumber) {
 //      rowNumber--;
 //      return (rowNumber + 2) * rowNumber;
 //  }
   
-  private static Point mapIndexToCoordinates(int index) {
+  public static Point mapIndexToCoordinates(int index) {
     int x = index;
     int y = 1;
-    for (int i = 6; i > 2; i--) {
-      int rest = (int) (index - Math.pow(i, 2));
+    for (int i = 5; i > 0; i--) {
+      int rest =  index - (i * (i + 2));
       if (rest >= 0){
         x = rest;
         y = i+1;
@@ -111,7 +114,6 @@ public class Pitch {
   
   /**
    * sets a chip of player on top of the "stack" of a field
-   *  
    * @param index index of the field (internal array representation) to set the chip
    * @param player player to set the chip for
    */
@@ -139,27 +141,86 @@ public class Pitch {
     return possibleMoves;
   }
   
-  private List<Integer> getPossibleMovesForOneChip(int index, int positioninStack) {
-    List<Integer> moves = new ArrayList<Integer>();
-    int stepSize = positioninStack + 1;
-    
-    int moveLeft = index - stepSize;
-    int moveRight = index + stepSize;
-    
-    if (isValidField(moveLeft)) moves.add(moveLeft);
-    if (isValidField(moveRight)) moves.add(moveRight);
-    
-    return moves;
+  /**
+   * wrapper for the recursive function
+   * 
+   * @param index the index to start looking from
+   * @param positioninStack position in fields stack
+   * @return a list of possible fields to move to
+   */
+  public List<Integer> getPossibleMovesForOneChip(int index, int positioninStack) {
+    return possibleFieldsToMoveToForOneChip(index, positioninStack + 1, new ArrayList<Integer>(), new HashSet<Integer>());
+  }
+  
+  /**
+   * recursively checks for possible fields to move to and returns a list of those
+   * 
+   * @param index the index to start looking from
+   * @param stepSize the number of steps for the move (depends on the position within fields stack)
+   * @param possibleFields the accumulation of possibles moves
+   * @param fieldsVisited Set to overcome the issue of repeatedly visited fields 
+   * @return a list of possible fields to move to
+   */
+  private List<Integer> possibleFieldsToMoveToForOneChip(int index, int stepSize, List<Integer> possibleFields, Set<Integer> fieldsVisited) {
+    if (stepSize == 0) {
+      possibleFields.add(index);
+    } else {
+      fieldsVisited.add(index);
+      int moveLeft = index - 1;
+      int moveRight = index + 1;
+      
+      int rowNr = mapIndexToCoordinates(index).y;
+      boolean evenRowNr = rowNr % 2 == 0;
+      int moveTopOrBottom;
+      
+      if (evenRowNr) {
+        moveTopOrBottom = (index % 2 == 0) ? getFieldToTheBottom(index, rowNr) : getFieldToTheTop(index, rowNr);
+      } else {
+        moveTopOrBottom = (index % 2 == 0) ? getFieldToTheTop(index, rowNr) : getFieldToTheBottom(index, rowNr);
+      }
+      // only call recursively if:
+      //    - next field is valid
+      //    - was not yet visited
+      //    - is within same row (only checked for left and right recursive calls)
+      if (isValidField(moveLeft) &&
+          !fieldsVisited.contains(moveLeft) &&
+          isFieldWithinSameRow(rowNr, moveLeft)) 
+        possibleFieldsToMoveToForOneChip(moveLeft, stepSize - 1, possibleFields, fieldsVisited);
+      if (isValidField(moveRight) &&
+          !fieldsVisited.contains(moveRight) &&
+          isFieldWithinSameRow(rowNr, moveRight))
+        possibleFieldsToMoveToForOneChip(moveRight, stepSize - 1, possibleFields, fieldsVisited);
+      if (isValidField(moveTopOrBottom) && !fieldsVisited.contains(moveTopOrBottom)) possibleFieldsToMoveToForOneChip(moveTopOrBottom, stepSize - 1, possibleFields, fieldsVisited);
+    }
+    return possibleFields;
+  }
+  
+  private boolean isFieldWithinSameRow(int rowNr, int newIndex) {
+    return rowNr == mapIndexToCoordinates(newIndex).y;
+  }
+  
+  private int getFieldToTheTop(int index, int columnNr) {
+    return index + (2 * columnNr) + 2;
+  }
+  
+  private int getFieldToTheBottom(int index, int columnNr) {
+    return index - (2 * columnNr);
   }
   
   
-  
+  /**
+   * checks whether index is pointing to a valid field of the pitch
+   * 
+   * @param index the index to be checked
+   * @return boolean whether index is valid
+   */
   private boolean isValidField(int index) {
-    return index > 0 && index < this.pitch.length && index != invalidField;
+    return index >= 0 && index < this.pitch.length && index != invalidField && this.pitch[index][2] == 0;
   }
   
   /**
    * returns a List of movable chips for one player - so to speak: returns all chips that are on top of the stacks of all fields
+   * 
    * @param player the player to get the movable chips for
    * @return a list of movable chips for one player  - the list contains a Point whereby x is the index of the field and y the position within that fields stack 
    */
