@@ -40,7 +40,7 @@ public class Client {
             }
 			
 			// calculate move
-			List<Move> possibleMoves = pitch.getPossibleMoves(playerNumber + 1);
+			List<Move> possibleMoves = pitch.getPossibleMoves(playerNumber);
 			System.out.println(possibleMoves);
 			Move m = possibleMoves.get((int)(Math.random() * possibleMoves.size()));
 			System.out.println(m);

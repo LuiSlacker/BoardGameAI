@@ -9,8 +9,9 @@ import java.util.Set;
 import lenz.htw.bogapr.Move;
 
 /**
- * Pitch representation with a bunch of utility methods for mutation
- *
+ * This class represents the pitch of the board game
+ * It is able to track player moves to keep an up to date version of the pitch
+ * and generate possible moves for a given player to a given time
  */
 public class Pitch {
   
@@ -26,7 +27,6 @@ public class Pitch {
   }
   
   private void initializePitch() {
-    
     // invalidate top lefthand corner
     this.pitch[invalidField][0] = INVALID;
     this.pitch[invalidField][1] = INVALID;
@@ -47,9 +47,10 @@ public class Pitch {
   }
   
   /**
-   * pitch initialization helper
-   * @param index
-   * @param player
+   * Pitch initialization helper
+   * 
+   * @param index the index of the field to be initialized
+   * @param player the player to initialize the field with
    */
   private void intializeSingleFieldWithPlayer(int index, int player){
     for (int i = 0; i < 3; i++) {
@@ -57,33 +58,9 @@ public class Pitch {
     }
   }
   
-  private static int mapCoordinatesToIndex(int x, int y) {
-      return (int) (x + Math.pow(y, 2) - 1);
-  }
-  
-//  deprecated - left for report (n*n+2)
-//  private static int rowOffset(int rowNumber) {
-//      rowNumber--;
-//      return (rowNumber + 2) * rowNumber;
-//  }
-  
-  public static Point mapIndexToCoordinates(int index) {
-    int x = index;
-    int y = 1;
-    for (int i = 5; i > 0; i--) {
-      int rest =  index - (i * (i + 2));
-      if (rest >= 0){
-        x = rest;
-        y = i+1;
-        break;
-      }
-    }
-    return new Point(x, y);
-  }
-  
   /**
-   * handles one move of a chip
-   * NOTE: No validation of move necessary since server only sends valid moves
+   * Handles one move of a chip
+   * No validation of move necessary since server only sends valid moves
    * 
    * @param move the move to be taken care of
    */
@@ -95,7 +72,7 @@ public class Pitch {
   }
   
   /**
-   * removes the chip which is on top of the "stack" of a field and returns the corresponding player
+   * Removes the chip which is on top of the "stack" of a given field and returns the respective player
    * 
    * @param index index of the field (internal array representation) to take the chip from
    * @return the player of the top most chip of the "stack" of that field
@@ -113,7 +90,8 @@ public class Pitch {
   }
   
   /**
-   * sets a chip of player on top of the "stack" of a field
+   * Sets a chip of a given player on top of the "stack" of a field
+   * 
    * @param index index of the field (internal array representation) to set the chip
    * @param player player to set the chip for
    */
@@ -126,9 +104,15 @@ public class Pitch {
       }
   }
   
+  /**
+   * Generates a List of possible Moves for a given player
+   * 
+   * @param player the player to generate the list for
+   * @return a List<Moves> containing all possible Moves for a given player to a given time
+   */
   public List<Move> getPossibleMoves(int player) {
     List<Move> possibleMoves = new ArrayList<Move>();
-    List<Point> movablePlayerChips = findMovablePlayerChips(player);
+    List<Point> movablePlayerChips = findMovablePlayerChips(player + 1);
     for (Point chip: movablePlayerChips) {
       Point fromCoordinate = mapIndexToCoordinates(chip.x);
       List<Integer> possibleMovesForOneChip = getPossibleMovesForOneChip(chip.x, chip.y);
@@ -137,12 +121,11 @@ public class Pitch {
         possibleMoves.add(new Move(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y));
       }
     }
-    
     return possibleMoves;
   }
   
   /**
-   * wrapper for the recursive function
+   * Wrapper for the recursive function - possibleFieldsToMoveToForOneChip
    * 
    * @param index the index to start looking from
    * @param positioninStack position in fields stack
@@ -153,7 +136,7 @@ public class Pitch {
   }
   
   /**
-   * recursively checks for possible fields to move to and returns a list of those
+   * Recursively checks for possible fields to move to and returns a list of those
    * 
    * @param index the index to start looking from
    * @param stepSize the number of steps for the move (depends on the position within fields stack)
@@ -179,9 +162,9 @@ public class Pitch {
         moveTopOrBottom = (index % 2 == 0) ? getFieldToTheTop(index, rowNr) : getFieldToTheBottom(index, rowNr);
       }
       // only call recursively if:
-      //    - next field is valid
-      //    - was not yet visited
-      //    - is within same row (only checked for left and right recursive calls)
+      //    * next field is valid
+      //    * was not yet visited
+      //    * is within same row (only checked for left and right recursive calls)
       if (isValidField(moveLeft) &&
           !fieldsVisited.contains(moveLeft) &&
           isFieldWithinSameRow(rowNr, moveLeft)) 
@@ -195,23 +178,14 @@ public class Pitch {
     return possibleFields;
   }
   
-  private boolean isFieldWithinSameRow(int rowNr, int newIndex) {
-    return rowNr == mapIndexToCoordinates(newIndex).y;
-  }
-  
-  private int getFieldToTheTop(int index, int columnNr) {
-    return index + (2 * columnNr) + 2;
-  }
-  
-  private int getFieldToTheBottom(int index, int columnNr) {
-    return index - (2 * columnNr);
-  }
-  
-  
   /**
-   * checks whether index is pointing to a valid field of the pitch
+   * Checks whether index is pointing to a valid field of the pitch
+   * The checks for the field include:
+   *    * if it is within the pitch's range
+   *    * if it is not the excluded field (top - left)
+   *    * if it is not fully occupied
    * 
-   * @param index the index to be checked
+   * @param index the index of the field to be checked
    * @return boolean whether index is valid
    */
   private boolean isValidField(int index) {
@@ -219,10 +193,10 @@ public class Pitch {
   }
   
   /**
-   * returns a List of movable chips for one player - so to speak: returns all chips that are on top of the stacks of all fields
+   * Returns a List of movable chips for one player
    * 
    * @param player the player to get the movable chips for
-   * @return a list of movable chips for one player  - the list contains a Point whereby x is the index of the field and y the position within that fields stack 
+   * @return a list of movable chips for one player - the list contains a Point whereby x is the index of the field and y the position within that fields stack 
    */
   private List<Point> findMovablePlayerChips(int player) {
     List<Point> possibleMoves = new ArrayList<Point>();
@@ -238,5 +212,68 @@ public class Pitch {
     return possibleMoves;
   }
   
+  
+  /***************************************************************************************************************
+   ** STATIC METHODS
+   **************************************************************************************************************/
+  
+  /**
+   * Maps coordinates to the pitch-representing array index
+   * @param x x-coordinate
+   * @param y y-coordinate
+   * @return the respective index
+   */
+  private static int mapCoordinatesToIndex(int x, int y) {
+      return (int) (x + Math.pow(y, 2) - 1);
+  }
+
+  /**
+   * Maps index to coordinates
+   * @param index the index to be transformed
+   * @return a Point representing the coordinates
+   */
+  public static Point mapIndexToCoordinates(int index) {
+    int x = index;
+    int y = 1;
+    for (int i = 5; i > 0; i--) {
+      int rest =  index - (i * (i + 2));
+      if (rest >= 0){
+        x = rest;
+        y = i+1;
+        break;
+      }
+    }
+    return new Point(x, y);
+  }
+  
+  /**
+   * Checks if a given field is within the same row as the given rowNr
+   * @param rowNr the number of the row to be checked against
+   * @param newIndex the index to be checked
+   * @return
+   */
+  private static boolean isFieldWithinSameRow(int rowNr, int newIndex) {
+    return rowNr == mapIndexToCoordinates(newIndex).y;
+  }
+  
+  /**
+   * Returns the index of the field to the top
+   * @param index
+   * @param columnNr
+   * @return
+   */
+  private static int getFieldToTheTop(int index, int columnNr) {
+    return index + (2 * columnNr) + 2;
+  }
+  
+  /**
+   * Returns the index of the field to the bottom
+   * @param index
+   * @param columnNr
+   * @return 
+   */
+  private static int getFieldToTheBottom(int index, int columnNr) {
+    return index - (2 * columnNr);
+  }
   
 }
