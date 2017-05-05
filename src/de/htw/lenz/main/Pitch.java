@@ -111,7 +111,7 @@ public class Pitch {
    * @return a List<Moves> containing all possible Moves for a given player to a given time
    */
   public List<Move> getPossibleMoves(int player) {
-    List<Move> possibleMoves = new ArrayList<Move>();
+    List<Move> possibleMoves = new ArrayList<>();
     List<Point> movablePlayerChips = findMovablePlayerChips(player + 1);
     for (Point chip: movablePlayerChips) {
       Point fromCoordinate = mapIndexToCoordinates(chip.x);
@@ -148,34 +148,42 @@ public class Pitch {
     if (stepSize == 0) {
       possibleFields.add(index);
     } else {
+      int rowNr = mapIndexToCoordinates(index).y;
       fieldsVisited.add(index);
+      
       int moveLeft = index - 1;
       int moveRight = index + 1;
+      int moveTopOrBottom = getTopOrBottomField(index, rowNr);
       
-      int rowNr = mapIndexToCoordinates(index).y;
-      boolean evenRowNr = rowNr % 2 == 0;
-      int moveTopOrBottom;
-      
-      if (evenRowNr) {
-        moveTopOrBottom = (index % 2 == 0) ? getFieldToTheBottom(index, rowNr) : getFieldToTheTop(index, rowNr);
-      } else {
-        moveTopOrBottom = (index % 2 == 0) ? getFieldToTheTop(index, rowNr) : getFieldToTheBottom(index, rowNr);
-      }
       // only call recursively if:
       //    * next field is valid
       //    * was not yet visited
       //    * is within same row (only checked for left and right recursive calls)
-      if (isValidField(moveLeft) &&
-          !fieldsVisited.contains(moveLeft) &&
-          isFieldWithinSameRow(rowNr, moveLeft)) 
+      if (isValidField(moveLeft) && !fieldsVisited.contains(moveLeft) && isFieldWithinSameRow(rowNr, moveLeft)) 
         possibleFieldsToMoveToForOneChip(moveLeft, stepSize - 1, possibleFields, fieldsVisited);
-      if (isValidField(moveRight) &&
-          !fieldsVisited.contains(moveRight) &&
-          isFieldWithinSameRow(rowNr, moveRight))
+      if (isValidField(moveRight) && !fieldsVisited.contains(moveRight) && isFieldWithinSameRow(rowNr, moveRight))
         possibleFieldsToMoveToForOneChip(moveRight, stepSize - 1, possibleFields, fieldsVisited);
-      if (isValidField(moveTopOrBottom) && !fieldsVisited.contains(moveTopOrBottom)) possibleFieldsToMoveToForOneChip(moveTopOrBottom, stepSize - 1, possibleFields, fieldsVisited);
+      if (isValidField(moveTopOrBottom) && !fieldsVisited.contains(moveTopOrBottom)) 
+        possibleFieldsToMoveToForOneChip(moveTopOrBottom, stepSize - 1, possibleFields, fieldsVisited);
     }
     return possibleFields;
+  }
+  
+  /**
+   * Returns the field to the top or bottom of a given field
+   * @param index
+   * @param rowNr
+   * @return
+   */
+  private int getTopOrBottomField(int index, int rowNr) {
+    int moveTopOrBottom;
+    boolean evenRowNr = rowNr % 2 == 0;
+    if (evenRowNr) {
+      moveTopOrBottom = (index % 2 == 0) ? getFieldToTheBottom(index, rowNr) : getFieldToTheTop(index, rowNr);
+    } else {
+      moveTopOrBottom = (index % 2 == 0) ? getFieldToTheTop(index, rowNr) : getFieldToTheBottom(index, rowNr);
+    }
+    return moveTopOrBottom;
   }
   
   /**
@@ -199,7 +207,7 @@ public class Pitch {
    * @return a list of movable chips for one player - the list contains a Point whereby x is the index of the field and y the position within that fields stack 
    */
   private List<Point> findMovablePlayerChips(int player) {
-    List<Point> possibleMoves = new ArrayList<Point>();
+    List<Point> possibleMoves = new ArrayList<>();
     for (int i = 0; i < pitch.length; i++) {
       innerloop:
       for (int j = 2; j >= 0; j--) {

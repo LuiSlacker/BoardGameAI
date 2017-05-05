@@ -23,7 +23,7 @@ final class Task implements Runnable {
 	
 	@Override
 	public void run() {
-		Client client = new Client(this.clientName);
+		new Client(this.clientName);
 	}
 	
 }
