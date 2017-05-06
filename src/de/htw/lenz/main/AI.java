@@ -1,9 +1,37 @@
 package de.htw.lenz.main;
 
+import java.util.List;
+
 import lenz.htw.bogapr.Move;
 
-public interface AI {
+public class AI {
   
-  public Move chooseWisestMove();
+  private Pitch pitch;
+  private int player;
+
+  public AI(Pitch pitch, int player) {
+    this.pitch = pitch;
+    this.player = player;
+  }
+  
+  public Node negamax(Pitch pitch , int originalDepth, int depth) {
+    List<Move> possibleMoves = pitch.getPossibleMoves(this.player);
+    if (depth == 0 || possibleMoves.isEmpty()) {
+      return new Node(this.pitch.assessConfiguration(this.player), null);
+    } else {
+      double bestValue = Integer.MIN_VALUE;
+      Move bestMove = null;
+      
+      for (Move move : possibleMoves) {
+        this.pitch.moveChip(move);
+        double childValue = -negamax(pitch, originalDepth, depth -1).getMinMaxValue();
+        bestValue = Math.max(bestValue, childValue);
+        if (bestValue == childValue && depth == originalDepth) bestMove = move;
+        this.pitch.moveChipBack(move);
+      }
+      return new Node(bestValue, bestMove);
+    }
+  }
+  
   
 }

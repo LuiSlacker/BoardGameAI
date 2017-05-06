@@ -71,6 +71,13 @@ public class Pitch {
       setChip(toIndex, player);
   }
   
+  public void moveChipBack(Move move) {
+    int fromIndex  = mapCoordinatesToIndex(move.toX, move.toY);
+    int toIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
+    int player = takeChip(fromIndex);
+    setChip(toIndex, player);
+  }
+  
   /**
    * Removes the chip which is on top of the "stack" of a given field and returns the respective player
    * 
@@ -283,5 +290,9 @@ public class Pitch {
   private static int getFieldToTheBottom(int index, int columnNr) {
     return index - (2 * columnNr);
   }
-  
+
+  public double assessConfiguration(int player) {
+    return 0.2;
+  }
+
 }
