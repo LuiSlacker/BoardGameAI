@@ -16,7 +16,9 @@ import lenz.htw.bogapr.Move;
 public class Pitch {
   
   private int[][] pitch = new int[47][3];
-  private static int invalidField = 35;
+  private int[] score = new int[3];
+  
+  private static final int invalidField = 35;
   private static final int INVALID = Integer.MIN_VALUE;
   private static final int PLAYER1 = 1;
   private static final int PLAYER2 = 2;
@@ -98,19 +100,40 @@ public class Pitch {
   
   /**
    * Sets a chip of a given player on top of the "stack" of a field
+   * and updates the score if the chip is placed on top of another player
    * 
    * @param index index of the field (internal array representation) to set the chip
    * @param player player to set the chip for
    */
   private void setChip(int index, int player) {
-      for (int i = 0; i <= 2; i++) {
-          if (this.pitch[index][i] == 0) {
-              this.pitch[index][i] = player;
-              break;
-          }
+    for (int i = 0; i <= 2; i++) {
+      if (this.pitch[index][i] == 0) {
+        this.pitch[index][i] = player;
+        if (i > 0 && this.pitch[index][i-1] != player) increaseScore(player);
+        break;
       }
+    }
   }
   
+  /**
+   * Increases the score for a given player by 1
+   * 
+   * @param player the player to increment the score for
+   */
+  private void increaseScore(int player) {
+    this.score[player] += 1;
+  }
+  
+  /**
+   * Returns the score for a given player
+   * 
+   * @param player the player to return the score for
+   * @return the score for the given player
+   */
+  private int getScoreForPlayer(int player) {
+    return this.score[player];
+  }
+
   /**
    * Generates a List of possible Moves for a given player
    * 
@@ -119,7 +142,7 @@ public class Pitch {
    */
   public List<Move> getPossibleMoves(int player) {
     List<Move> possibleMoves = new ArrayList<>();
-    List<Point> movablePlayerChips = findMovablePlayerChips(player + 1);
+    List<Point> movablePlayerChips = findMovablePlayerChips(player);
     for (Point chip: movablePlayerChips) {
       Point fromCoordinate = mapIndexToCoordinates(chip.x);
       List<Integer> possibleMovesForOneChip = getPossibleMovesForOneChip(chip.x, chip.y);
@@ -292,7 +315,23 @@ public class Pitch {
   }
 
   public double assessConfiguration(int player) {
+    //if (player == 1) {
+      evaluateChipPositions(player);
+    //}
     return 0.2;
+  }
+  
+  private double evaluateChipPositions(int player) {
+    double value = getScoreForPlayer(player);
+//    for (int i = 0; i < pitch.length; i++) {
+//      for (int j = 0; j < 3; j++) {
+//        if (this.pitch[i][j] == player) {
+//          value += mapIndexToCoordinates(i).getY();
+//        }
+//      }
+//    }
+    System.out.println(value);
+    return value;
   }
 
 }

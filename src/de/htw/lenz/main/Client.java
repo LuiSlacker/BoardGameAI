@@ -17,6 +17,7 @@ public class Client {
 	private int playerNumber;
 	
 	private Pitch pitch;
+	private AI ai;
 
 	public Client(String clientName) {
 		try {
@@ -26,6 +27,7 @@ public class Client {
 			playerNumber = networkClient.getMyPlayerNumber();
 			
 			pitch = new Pitch();
+			ai = new AI(pitch, playerNumber);
 			listenForMoves();
 	    } catch (IOException e) {
 	        throw new RuntimeException("", e);
@@ -40,10 +42,14 @@ public class Client {
             }
 			
 			// calculate move
-			List<Move> possibleMoves = pitch.getPossibleMoves(playerNumber);
-			System.out.println(possibleMoves);
-			Move m = possibleMoves.get((int)(Math.random() * possibleMoves.size()));
+//			List<Move> possibleMoves = pitch.getPossibleMoves(playerNumber);
+//			System.out.println(possibleMoves);
+//			Move m = possibleMoves.get((int)(Math.random() * possibleMoves.size()));
+//			System.out.println(m);
+			
+			Move m = ai.getWisestMove();
 			System.out.println(m);
+			
 			networkClient.sendMove(m);
 		}
 	}

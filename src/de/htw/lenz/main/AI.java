@@ -8,13 +8,19 @@ public class AI {
   
   private Pitch pitch;
   private int player;
+  private static final int DEPTH = 5;
 
   public AI(Pitch pitch, int player) {
     this.pitch = pitch;
-    this.player = player;
+    this.player = player +1 ;
   }
   
-  public Node negamax(Pitch pitch , int originalDepth, int depth) {
+  public Move getWisestMove(){
+    return negamax(this.pitch, DEPTH, DEPTH).getMove();
+    
+  }
+  
+  private Node negamax(Pitch pitch , int originalDepth, int depth) {
     List<Move> possibleMoves = pitch.getPossibleMoves(this.player);
     if (depth == 0 || possibleMoves.isEmpty()) {
       return new Node(this.pitch.assessConfiguration(this.player), null);
