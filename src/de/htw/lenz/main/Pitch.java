@@ -13,39 +13,55 @@ import lenz.htw.bogapr.Move;
  * It is able to track player moves to keep an up to date version of the pitch
  * and generate possible moves for a given player to a given time
  */
-public class Pitch {
+public class Pitch implements Cloneable{
   
   private int[][] pitch = new int[47][3];
   private int[] score = new int[3];
   
-  private static final int invalidField = 35;
+  private static final int INVALID_FIELD = 35;
   private static final int INVALID = Integer.MIN_VALUE;
-  private static final int PLAYER1 = 1;
-  private static final int PLAYER2 = 2;
-  private static final int PLAYER3 = 3;
+  private static final int EMPTY = Integer.MAX_VALUE;
+  private static final int PLAYER1 = 0;
+  private static final int PLAYER2 = 1;
+  private static final int PLAYER3 = 2;
 
   public Pitch() {
     initializePitch();
   }
   
+  public Object clone() throws CloneNotSupportedException {
+    Pitch clonedPitch = (Pitch) super.clone();
+    clonedPitch.pitch = Utils.deepCopyMatrix2D(this.pitch);
+    return clonedPitch;
+  }
+  
   private void initializePitch() {
+    
+    initializeEmptyPitch();
+    
     // invalidate top lefthand corner
-    this.pitch[invalidField][0] = INVALID;
-    this.pitch[invalidField][1] = INVALID;
-    this.pitch[invalidField][2] = INVALID;
+    intializeSingleField(INVALID_FIELD, INVALID);
     
     // set initial player chips
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(0,1), PLAYER1);
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(1,1), PLAYER1);
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(2,1), PLAYER1);
+    intializeSingleField(mapCoordinatesToIndex(0,1), PLAYER1);
+    intializeSingleField(mapCoordinatesToIndex(1,1), PLAYER1);
+    intializeSingleField(mapCoordinatesToIndex(2,1), PLAYER1);
     
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(1,6), PLAYER2);
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(2,6), PLAYER2);
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(0,5), PLAYER2);
+    intializeSingleField(mapCoordinatesToIndex(1,6), PLAYER2);
+    intializeSingleField(mapCoordinatesToIndex(2,6), PLAYER2);
+    intializeSingleField(mapCoordinatesToIndex(0,5), PLAYER2);
     
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(10,6), PLAYER3);
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(11,6), PLAYER3);
-    intializeSingleFieldWithPlayer(mapCoordinatesToIndex(10,5), PLAYER3);
+    intializeSingleField(mapCoordinatesToIndex(10,6), PLAYER3);
+    intializeSingleField(mapCoordinatesToIndex(11,6), PLAYER3);
+    intializeSingleField(mapCoordinatesToIndex(10,5), PLAYER3);
+  }
+  
+  private void initializeEmptyPitch() {
+    for (int i = 0; i < pitch.length; i++) {
+      for (int j = 0; j <= 2; j++) {
+        this.pitch[i][j] = EMPTY;
+      }
+    }
   }
   
   /**
@@ -54,9 +70,9 @@ public class Pitch {
    * @param index the index of the field to be initialized
    * @param player the player to initialize the field with
    */
-  private void intializeSingleFieldWithPlayer(int index, int player){
+  private void intializeSingleField(int index, int value) {
     for (int i = 0; i < 3; i++) {
-        this.pitch[index][i] = player;
+        this.pitch[index][i] = value;
     }
   }
   
@@ -69,14 +85,19 @@ public class Pitch {
   public void moveChip(Move move) {
       int fromIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
       int toIndex  = mapCoordinatesToIndex(move.toX, move.toY);
-      int player = takeChip(fromIndex);
+      int player = takeChip(fromIndex, false);
       setChip(toIndex, player);
   }
   
+  /**
+   * Undoes a given move and decrements score if applicable
+   * 
+   * @param move the Move to be undone
+   */
   public void moveChipBack(Move move) {
     int fromIndex  = mapCoordinatesToIndex(move.toX, move.toY);
     int toIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
-    int player = takeChip(fromIndex);
+    int player = takeChip(fromIndex, true);
     setChip(toIndex, player);
   }
   
@@ -86,16 +107,17 @@ public class Pitch {
    * @param index index of the field (internal array representation) to take the chip from
    * @return the player of the top most chip of the "stack" of that field
    */
-  private int takeChip(int index) {
-      int player = INVALID;
-      for (int i = 2; i >= 0; i--) {
-          if (this.pitch[index][i] != 0) {
-              player = this.pitch[index][i];
-              this.pitch[index][i] = 0;
-              break;
-          };
-      }
-      return player;
+  private int takeChip(int index, boolean AIMode) {
+    int player = INVALID;
+    for (int i = 2; i >= 0; i--) {
+      if (this.pitch[index][i] != EMPTY) {
+        player = this.pitch[index][i];
+        this.pitch[index][i] = EMPTY;
+        if (AIMode && i > 0 && this.pitch[index][i-1] != player) decrementScore(player);
+        break;
+      };
+    }
+    return player;
   }
   
   /**
@@ -107,21 +129,30 @@ public class Pitch {
    */
   private void setChip(int index, int player) {
     for (int i = 0; i <= 2; i++) {
-      if (this.pitch[index][i] == 0) {
+      if (this.pitch[index][i] == EMPTY) {
         this.pitch[index][i] = player;
-        if (i > 0 && this.pitch[index][i-1] != player) increaseScore(player);
+        if (i > 0 && this.pitch[index][i-1] != player) incrementScore(player);
         break;
       }
     }
   }
   
   /**
-   * Increases the score for a given player by 1
+   * Increments the score for a given player by 1
    * 
    * @param player the player to increment the score for
    */
-  private void increaseScore(int player) {
-    this.score[player] += 1;
+  private void incrementScore(int player) {
+    if (player > 0 && player < 3) this.score[player] += 1;
+  }
+  
+  /**
+   * Decrements the score for a given player by 1
+   * 
+   * @param player the player to decrement the score for
+   */
+  private void decrementScore(int player) {
+    this.score[player] -= 1;
   }
   
   /**
@@ -133,7 +164,20 @@ public class Pitch {
   private int getScoreForPlayer(int player) {
     return this.score[player];
   }
-
+  
+  /**
+   * Returns a random valid Move for a given player
+   * 
+   * @param player the player to generate the random Move for
+   * @return a random Move
+   */
+  public Move getRandomMove(int player) {
+    List<Move> possibleMoves = getPossibleMoves(player);
+    System.out.println(possibleMoves);
+    return possibleMoves.get((int)(Math.random() * possibleMoves.size()));
+  }
+  
+  
   /**
    * Generates a List of possible Moves for a given player
    * 
@@ -227,24 +271,26 @@ public class Pitch {
    * @return boolean whether index is valid
    */
   private boolean isValidField(int index) {
-    return index >= 0 && index < this.pitch.length && index != invalidField && this.pitch[index][2] == 0;
+    return index >= 0 && index < this.pitch.length && index != INVALID_FIELD && this.pitch[index][2] == EMPTY;
   }
   
   /**
    * Returns a List of movable chips for one player
    * 
    * @param player the player to get the movable chips for
-   * @return a list of movable chips for one player - the list contains a Point whereby x is the index of the field and y the position within that fields stack 
+   * @return a list of movable chips for one player
+   *         The list contains a Point whereby x is the index of the field and y the position within that fields stack 
    */
   private List<Point> findMovablePlayerChips(int player) {
     List<Point> possibleMoves = new ArrayList<>();
     for (int i = 0; i < pitch.length; i++) {
+      if(pitch[i][0] == INVALID) continue; // skip invalid field
       innerloop:
       for (int j = 2; j >= 0; j--) {
         if (this.pitch[i][j] == player) {
           possibleMoves.add(new Point(i,j));
           break innerloop;
-        } else if (this.pitch[i][j] != 0) break innerloop;
+        } else if (this.pitch[i][j] != EMPTY) break innerloop;
       }
     }
     return possibleMoves;
@@ -315,22 +361,28 @@ public class Pitch {
   }
 
   public double assessConfiguration(int player) {
-    //if (player == 1) {
-      evaluateChipPositions(player);
-    //}
-    return 0.2;
+    return evaluateChipPositions(player);
   }
   
   private double evaluateChipPositions(int player) {
     double value = getScoreForPlayer(player);
-//    for (int i = 0; i < pitch.length; i++) {
-//      for (int j = 0; j < 3; j++) {
-//        if (this.pitch[i][j] == player) {
-//          value += mapIndexToCoordinates(i).getY();
-//        }
-//      }
-//    }
-    System.out.println(value);
+    if (player == PLAYER1) {
+      for (int i = 0; i < pitch.length; i++) {
+        for (int j = 0; j < 3; j++) {
+          if (this.pitch[i][j] == player) {
+            value += mapIndexToCoordinates(i).getY();
+          }
+        }
+      }
+    } else if (player == PLAYER2) {
+      for (int i = 0; i < pitch.length; i++) {
+        for (int j = 0; j < 3; j++) {
+          if (this.pitch[i][j] == player) {
+            value += mapIndexToCoordinates(i).getX();
+          }
+        }
+      }
+    } else {}
     return value;
   }
 

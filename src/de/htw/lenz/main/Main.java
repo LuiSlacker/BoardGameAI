@@ -10,7 +10,6 @@ public class Main {
 		Thread t3 = new Thread(new Task("Zoey"));
 		t3.start();
 	}
-
 }
 
 final class Task implements Runnable {

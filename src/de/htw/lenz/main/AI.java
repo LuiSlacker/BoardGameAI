@@ -8,15 +8,15 @@ public class AI {
   
   private Pitch pitch;
   private int player;
-  private static final int DEPTH = 5;
 
   public AI(Pitch pitch, int player) {
     this.pitch = pitch;
-    this.player = player +1 ;
+    this.player = player;
   }
   
-  public Move getWisestMove(){
-    return negamax(this.pitch, DEPTH, DEPTH).getMove();
+  public Move getWisestMove(int depth){
+    Move m = negamax(this.pitch, depth, depth).getMove();
+    return m;
     
   }
   
