@@ -1,22 +1,36 @@
-package de.htw.lenz.main;
+package de.htw.lenz.AI;
 
 import java.util.List;
 
+import de.htw.lenz.main.Node;
+import de.htw.lenz.main.Pitch;
 import lenz.htw.bogapr.Move;
 
-public class AI3Players {
+public class MinMaxAI implements GameAI{
 
   private Pitch pitch;
   private int maximizingPlayer;
+  private Move currentlyWisestMove;
+  
+  private static int INITIAL_DEPTH = 3;
 
-  public AI3Players(Pitch pitch, int player) {
-    this.pitch = pitch;
-    this.maximizingPlayer = player;
+  @Override
+  public void start() {
+    int depth = INITIAL_DEPTH;
+    while(true) {
+      currentlyWisestMove = getWisestMove(depth);
+      System.out.println("Depth:" + depth);
+      depth++;
+    }
+  }
+  
+  @Override
+  public Move getMove() {
+    return this.currentlyWisestMove;
   }
   
   public Move getWisestMove(int depth){
-    Move m = miniMax(maximizingPlayer, depth, depth).getMove();
-    return m;
+    return miniMax(maximizingPlayer, depth, depth).getMove();
     
   }
   
@@ -51,7 +65,6 @@ public class AI3Players {
       this.pitch.moveChip(move);
       double childValue = miniMax(getNextPlayer(player), originalDepth, depth - 1).getMinMaxValue();
       bestValue = Math.min(bestValue, childValue);
-      //if (bestValue == childValue && depth == originalDepth) bestMove = move;
       this.pitch.moveChipBack(move);
     }
     return new Node(bestValue, bestMove);
@@ -60,5 +73,15 @@ public class AI3Players {
   private int getNextPlayer(int player) {
     return (player + 1) % 3;
   }
-  
+
+  @Override
+  public void setPitch(Pitch pitch) {
+    this.pitch = pitch;
+  }
+
+  @Override
+  public void setPlayer(int player) {
+    this.maximizingPlayer = player;
+  }
+
 }

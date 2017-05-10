@@ -4,12 +4,12 @@ import java.util.List;
 
 import lenz.htw.bogapr.Move;
 
-public class AI {
+public class AI_old {
   
   private Pitch pitch;
   private int player;
 
-  public AI(Pitch pitch, int player) {
+  public AI_old(Pitch pitch, int player) {
     this.pitch = pitch;
     this.player = player;
   }

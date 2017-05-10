@@ -2,6 +2,7 @@ package de.htw.lenz.main;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,9 +30,15 @@ public class Pitch implements Cloneable{
     initializePitch();
   }
   
-  public Object clone() throws CloneNotSupportedException {
+  /**
+   * Deep-clones an instance of this class
+   * 
+   * @return a deep-cloned instance of the Pitch-class
+   */
+  public Pitch clone() throws CloneNotSupportedException {
     Pitch clonedPitch = (Pitch) super.clone();
     clonedPitch.pitch = Utils.deepCopyMatrix2D(this.pitch);
+    clonedPitch.score = Arrays.copyOf(this.score, this.score.length);
     return clonedPitch;
   }
   
@@ -56,6 +63,9 @@ public class Pitch implements Cloneable{
     intializeSingleField(mapCoordinatesToIndex(10,5), PLAYER3);
   }
   
+  /**
+   * Initializes the pitch
+   */
   private void initializeEmptyPitch() {
     for (int i = 0; i < pitch.length; i++) {
       for (int j = 0; j <= 2; j++) {
@@ -65,7 +75,7 @@ public class Pitch implements Cloneable{
   }
   
   /**
-   * Pitch initialization helper
+   * Initialized as given field with a given value
    * 
    * @param index the index of the field to be initialized
    * @param player the player to initialize the field with
@@ -91,6 +101,7 @@ public class Pitch implements Cloneable{
   
   /**
    * Undoes a given move and decrements score if applicable
+   * This method is only called by the AI Algorithm
    * 
    * @param move the Move to be undone
    */
@@ -173,7 +184,6 @@ public class Pitch implements Cloneable{
    */
   public Move getRandomMove(int player) {
     List<Move> possibleMoves = getPossibleMoves(player);
-    System.out.println(possibleMoves);
     return possibleMoves.get((int)(Math.random() * possibleMoves.size()));
   }
   
@@ -382,7 +392,15 @@ public class Pitch implements Cloneable{
           }
         }
       }
-    } else {}
+    } else {
+      for (int i = 0; i < pitch.length; i++) {
+        for (int j = 0; j < 3; j++) {
+          if (this.pitch[i][j] == player) {
+            value += 11 - mapIndexToCoordinates(i).getX();
+          }
+        }
+      }
+    }
     return value;
   }
 

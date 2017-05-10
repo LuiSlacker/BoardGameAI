@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import de.htw.lenz.AI.GameAI;
+import de.htw.lenz.AI.RandomAI;
 import lenz.htw.bogapr.Move;
 import lenz.htw.bogapr.net.NetworkClient;
 
@@ -14,13 +16,17 @@ public class Client {
 	private int networkLatencyMillis;
 	private int timeLimitMillis;
 	private int player;
+	private String clientName;
 	private int threadTimeout; 
+	private GameAI gameAI;
 	private static int ADDITIONAL_SLACK_TIME = 100;
 	
 	private Pitch pitch;
 
-	public Client(String clientName) {
+	public Client(String clientName, GameAI gameAI) {
 		try {
+		    this.gameAI = gameAI;
+		    this.clientName = clientName;
 		    pitch = new Pitch();
 		    
 			networkClient = new NetworkClient(null, clientName, ImageIO.read(new File("glasses.png")));
@@ -28,6 +34,7 @@ public class Client {
 			networkLatencyMillis = networkClient.getExpectedNetworkLatencyInMilliseconds();
 			threadTimeout = timeLimitMillis - (2 * networkLatencyMillis) - ADDITIONAL_SLACK_TIME;
 			player = networkClient.getMyPlayerNumber();
+			gameAI.setPlayer(player);
 			
 			listenForMoves();
 	    } catch (IOException e) {
@@ -42,25 +49,15 @@ public class Client {
 			  pitch.moveChip(receiveMove);
             }
 			
-			// calculate move
-//			Move moveToSend = this.pitch.getRandomMove(player);
-//			networkClient.sendMove(moveToSend);
-			
-			Pitch clonedPitch = null;
-			try {
-			  clonedPitch = (Pitch)this.pitch.clone();
-            } catch (CloneNotSupportedException e1) {
-              e1.printStackTrace();
-            }
-			AICalculation aiCalculation = new AICalculation(clonedPitch, player);
-			Thread calculationThread = new Thread(aiCalculation);
+			gameAI.setPitch(deepClonePitch());
+			AIRunnable aiRunnable = new AIRunnable(gameAI);
+			Thread calculationThread = new Thread(aiRunnable);
 			calculationThread.start();
 			
 			Move moveToSend;
 			try {
 	          Thread.sleep(threadTimeout);
-	          System.out.println("Thread woken up...");
-	          moveToSend = aiCalculation.getWisestMove();
+	          moveToSend = aiRunnable.getMove();
 	        } catch (InterruptedException e) {
 	          moveToSend = this.pitch.getRandomMove(player);
 	          System.out.printf("AI-Thread Exception %s", player);
@@ -69,39 +66,39 @@ public class Client {
 	          calculationThread.stop();
             }
 			
+			System.out.printf("Sending move %s for %s", moveToSend, clientName);
+			System.out.println("----");
 			networkClient.sendMove(moveToSend);
-			System.out.println(moveToSend);
 		}
+	}
+	
+	private Pitch deepClonePitch() {
+	  Pitch clonedPitch = null;
+      try {
+        clonedPitch = this.pitch.clone();
+      } catch (CloneNotSupportedException e1) {
+        e1.printStackTrace();
+      }
+      return clonedPitch;
 	}
 
 }
 
-final class AICalculation implements Runnable {
+final class AIRunnable implements Runnable {
   
-  private Pitch pitch;
-  private int player;
-  private Move currentlyWisestMove;
+  private GameAI gameAI;
 
-  public AICalculation(Pitch pitch, int playerNumber) {
-      this.pitch = pitch;
-      this.player = playerNumber;
+  public AIRunnable(GameAI gameAI) {
+      this.gameAI = gameAI;
   }
   
   @Override
   public void run() {
-      this.currentlyWisestMove = this.pitch.getRandomMove(this.player);
-//      AI ai = new AI(this.pitch, this.player);
-      AI3Players ai = new AI3Players(this.pitch, this.player);
-      int depth = 3;
-      while(true) {
-        this.currentlyWisestMove = ai.getWisestMove(depth);
-        System.out.println("Depth:" + depth);
-        depth++;
-      }
+    gameAI.start();
   }
   
-  public Move getWisestMove() {
-    return this.currentlyWisestMove;
+  public Move getMove() {
+    return this.gameAI.getMove();
   }
   
 }
