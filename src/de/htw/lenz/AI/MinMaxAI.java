@@ -12,7 +12,7 @@ public class MinMaxAI implements GameAI{
   private int maximizingPlayer;
   private Move currentlyWisestMove;
   
-  private static int INITIAL_DEPTH = 3;
+  private static int INITIAL_DEPTH = 4;
 
   @Override
   public void start() {
@@ -30,7 +30,9 @@ public class MinMaxAI implements GameAI{
   }
   
   public Move getWisestMove(int depth){
-    return miniMax(maximizingPlayer, depth, depth).getMove();
+    Node node = miniMax(maximizingPlayer, depth, depth);
+    System.out.println(node.getMinMaxValue());
+    return node.getMove();
     
   }
   

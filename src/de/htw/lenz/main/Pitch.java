@@ -317,7 +317,7 @@ public class Pitch implements Cloneable{
    * @param y y-coordinate
    * @return the respective index
    */
-  private static int mapCoordinatesToIndex(int x, int y) {
+  public static int mapCoordinatesToIndex(int x, int y) {
       return (int) (x + Math.pow(y, 2) - 1);
   }
 
@@ -362,6 +362,7 @@ public class Pitch implements Cloneable{
   
   /**
    * Returns the index of the field to the bottom
+   * 
    * @param index
    * @param columnNr
    * @return 
@@ -371,37 +372,65 @@ public class Pitch implements Cloneable{
   }
 
   public double assessConfiguration(int player) {
-    return evaluateChipPositions(player);
+    double value = getScoreForPlayer(player) * 5.0;;
+    value += evaluateChipPositions(player);
+    return value;
   }
   
   private double evaluateChipPositions(int player) {
-    double value = getScoreForPlayer(player);
-    if (player == PLAYER1) {
-      for (int i = 0; i < pitch.length; i++) {
-        for (int j = 0; j < 3; j++) {
-          if (this.pitch[i][j] == player) {
-            value += mapIndexToCoordinates(i).getY();
-          }
-        }
-      }
-    } else if (player == PLAYER2) {
-      for (int i = 0; i < pitch.length; i++) {
-        for (int j = 0; j < 3; j++) {
-          if (this.pitch[i][j] == player) {
-            value += mapIndexToCoordinates(i).getX();
-          }
-        }
-      }
-    } else {
-      for (int i = 0; i < pitch.length; i++) {
-        for (int j = 0; j < 3; j++) {
-          if (this.pitch[i][j] == player) {
-            value += 11 - mapIndexToCoordinates(i).getX();
-          }
+    double value = 0.0;
+    List<Point> allChips = findAllPlayersChips(player);
+    for (int i = 0; i < allChips.size(); i++) {
+      int index = allChips.get(i).x;
+      Point coordinate = mapIndexToCoordinates(index);
+      value += getRelativeRow(coordinate, player); // / 6.0;
+      if (isWinningField(coordinate, player)) value += 5000.0;
+    }
+    return value;
+  }
+  
+  /**
+   * Returns all chips for a given player
+   * 
+   * @return all chips for a given player
+   */
+  private List<Point> findAllPlayersChips(int player) {
+    List<Point> allChips = new ArrayList<>();
+    for (int i = 0; i < pitch.length; i++) {
+      for (int j = 0; j < 3; j++) {
+        if (this.pitch[i][j] == player) {
+          allChips.add(new Point(i, j));
         }
       }
     }
-    return value;
+    return allChips;
+  }
+  
+  /**
+   * Returns the relative row(1-6) for a given player
+   * 
+   * @param coordinate the coordinate to return the relative row for
+   * @param player the player to return the relative row for
+   * @return the relative row for a given player
+   */
+  public int getRelativeRow(Point coordinate, int player){
+    int row = 0;
+    switch (player) {
+    case PLAYER1:
+      row = coordinate.y;
+      break;
+    case PLAYER2:
+      row = 6 - coordinate.y + (coordinate.x / 2) + (coordinate.x % 2);
+      break;
+    case PLAYER3:
+      row = 6 - (coordinate.x / 2);
+      break;
+    }
+    return row;
+  }
+  
+  private boolean isWinningField(Point coordinate, int player) {
+    return getRelativeRow(coordinate, player) == 6 && coordinate.x % 2 == 0;
   }
 
 }

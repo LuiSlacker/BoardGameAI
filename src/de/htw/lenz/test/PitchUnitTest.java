@@ -2,6 +2,7 @@ package de.htw.lenz.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.awt.Point;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -10,21 +11,21 @@ import de.htw.lenz.main.Pitch;
 
 public class PitchUnitTest {
 
-  @Test
-  public void possibleFieldsToMoveToForOneChipTest_Step1() {
-    Pitch pitch = new Pitch();
-    assertEquals(Arrays.asList(0, 2), pitch.getPossibleMovesForOneChip(1, 0));
-    assertEquals(Arrays.asList(1, 4), pitch.getPossibleMovesForOneChip(0, 0));
-    assertEquals(Arrays.asList(4, 6, 11), pitch.getPossibleMovesForOneChip(5, 0));
-    assertEquals(Arrays.asList(3, 5, 0), pitch.getPossibleMovesForOneChip(4, 0));
-  }
+//  @Test
+//  public void possibleFieldsToMoveToForOneChipTest_Step1() {
+//    Pitch pitch = new Pitch();
+//    assertEquals(Arrays.asList(0, 2), pitch.getPossibleMovesForOneChip(1, 0));
+//    assertEquals(Arrays.asList(1, 4), pitch.getPossibleMovesForOneChip(0, 0));
+//    assertEquals(Arrays.asList(4, 6, 11), pitch.getPossibleMovesForOneChip(5, 0));
+//    assertEquals(Arrays.asList(3, 5, 0), pitch.getPossibleMovesForOneChip(4, 0));
+//  }
   
-  @Test
-  public void possibleFieldsToMoveToForOneChipTest_Step2() {
-    Pitch pitch = new Pitch();
-    assertEquals(Arrays.asList(3, 0, 7, 2, 10, 12), pitch.getPossibleMovesForOneChip(5, 1));
-    assertEquals(Arrays.asList(4, 6), pitch.getPossibleMovesForOneChip(1, 1));
-  }
+//  @Test
+//  public void possibleFieldsToMoveToForOneChipTest_Step2() {
+//    Pitch pitch = new Pitch();
+//    assertEquals(Arrays.asList(3, 0, 7, 2, 10, 12), pitch.getPossibleMovesForOneChip(5, 1));
+//    assertEquals(Arrays.asList(4, 6), pitch.getPossibleMovesForOneChip(1, 1));
+//  }
   
 //  @Test
 //  public void possibleFieldsToMoveToForOneChipTest_Step3() {
@@ -39,6 +40,19 @@ public class PitchUnitTest {
     assertEquals(2, Pitch.mapIndexToCoordinates(5).y);
     assertEquals(1, Pitch.mapIndexToCoordinates(2).y);
     assertEquals(3, Pitch.mapIndexToCoordinates(8).y);
+  }
+  
+  @Test
+  public void getRelativeRowTest(){
+    Pitch pitch = new Pitch();
+    
+    assertEquals(5, pitch.getRelativeRow(new Point(2, 2), 1));
+    assertEquals(1, pitch.getRelativeRow(new Point(1, 6), 1));
+    assertEquals(6, pitch.getRelativeRow(new Point(2, 1), 1));
+    
+    assertEquals(1, pitch.getRelativeRow(new Point(11, 6), 2));
+    assertEquals(5, pitch.getRelativeRow(new Point(2, 2), 2));
+    assertEquals(6, pitch.getRelativeRow(new Point(1, 6), 2));
   }
 
 }

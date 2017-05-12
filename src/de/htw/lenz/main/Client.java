@@ -6,7 +6,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import de.htw.lenz.AI.GameAI;
-import de.htw.lenz.AI.RandomAI;
 import lenz.htw.bogapr.Move;
 import lenz.htw.bogapr.net.NetworkClient;
 
