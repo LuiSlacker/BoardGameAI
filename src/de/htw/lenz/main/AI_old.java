@@ -1,43 +1,43 @@
-package de.htw.lenz.main;
-
-import java.util.List;
-
-import lenz.htw.bogapr.Move;
-
-public class AI_old {
-  
-  private Pitch pitch;
-  private int player;
-
-  public AI_old(Pitch pitch, int player) {
-    this.pitch = pitch;
-    this.player = player;
-  }
-  
-  public Move getWisestMove(int depth){
-    Move m = negamax(this.pitch, depth, depth).getMove();
-    return m;
-    
-  }
-  
-  private Node negamax(Pitch pitch , int originalDepth, int depth) {
-    List<Move> possibleMoves = pitch.getPossibleMoves(this.player);
-    if (depth == 0 || possibleMoves.isEmpty()) {
-      return new Node(this.pitch.assessConfiguration(this.player), null);
-    } else {
-      double bestValue = Integer.MIN_VALUE;
-      Move bestMove = null;
-      
-      for (Move move : possibleMoves) {
-        this.pitch.moveChip(move);
-        double childValue = -negamax(pitch, originalDepth, depth -1).getMinMaxValue();
-        bestValue = Math.max(bestValue, childValue);
-        if (bestValue == childValue && depth == originalDepth) bestMove = move;
-        this.pitch.moveChipBack(move);
-      }
-      return new Node(bestValue, bestMove);
-    }
-  }
-  
-  
-}
+//package de.htw.lenz.main;
+//
+//import java.util.List;
+//
+//import lenz.htw.bogapr.Move;
+//
+//public class AI_old {
+//  
+//  private Pitch pitch;
+//  private int player;
+//
+//  public AI_old(Pitch pitch, int player) {
+//    this.pitch = pitch;
+//    this.player = player;
+//  }
+//  
+//  public Move getWisestMove(int depth){
+//    Move m = negamax(this.pitch, depth, depth).getMove();
+//    return m;
+//    
+//  }
+//  
+//  private Node negamax(Pitch pitch , int originalDepth, int depth) {
+//    List<Move> possibleMoves = pitch.getPossibleMoves(this.player);
+//    if (depth == 0 || possibleMoves.isEmpty()) {
+//      return new Node(this.pitch.assessConfiguration(this.player), null);
+//    } else {
+//      double bestValue = Integer.MIN_VALUE;
+//      Move bestMove = null;
+//      
+//      for (Move move : possibleMoves) {
+//        this.pitch.moveChip(move);
+//        double childValue = -negamax(pitch, originalDepth, depth -1).getMinMaxValue();
+//        bestValue = Math.max(bestValue, childValue);
+//        if (bestValue == childValue && depth == originalDepth) bestMove = move;
+//        this.pitch.moveChipBack(move);
+//      }
+//      return new Node(bestValue, bestMove);
+//    }
+//  }
+//  
+//  
+//}

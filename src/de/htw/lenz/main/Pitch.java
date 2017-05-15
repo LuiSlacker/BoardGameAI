@@ -230,7 +230,7 @@ public class Pitch implements Cloneable{
    */
   private List<Integer> possibleFieldsToMoveToForOneChip(int index, int stepSize, List<Integer> possibleFields, Set<Integer> fieldsVisited) {
     if (stepSize == 0) {
-      possibleFields.add(index);
+      if (!isFieldFullyOccupied(index) && !possibleFields.contains(index)) possibleFields.add(index);
     } else {
       int rowNr = mapIndexToCoordinates(index).y;
       fieldsVisited.add(index);
@@ -243,11 +243,11 @@ public class Pitch implements Cloneable{
       //    * next field is valid
       //    * was not yet visited
       //    * is within same row (only checked for left and right recursive calls)
-      if (isValidField(moveLeft) && !fieldsVisited.contains(moveLeft) && isFieldWithinSameRow(rowNr, moveLeft)) 
+      if (isValidField(moveLeft, stepSize) && !fieldsVisited.contains(moveLeft) && isFieldWithinSameRow(rowNr, moveLeft)) 
         possibleFieldsToMoveToForOneChip(moveLeft, stepSize - 1, possibleFields, fieldsVisited);
-      if (isValidField(moveRight) && !fieldsVisited.contains(moveRight) && isFieldWithinSameRow(rowNr, moveRight))
+      if (isValidField(moveRight, stepSize) && !fieldsVisited.contains(moveRight) && isFieldWithinSameRow(rowNr, moveRight))
         possibleFieldsToMoveToForOneChip(moveRight, stepSize - 1, possibleFields, fieldsVisited);
-      if (isValidField(moveTopOrBottom) && !fieldsVisited.contains(moveTopOrBottom)) 
+      if (isValidField(moveTopOrBottom, stepSize) && !fieldsVisited.contains(moveTopOrBottom)) 
         possibleFieldsToMoveToForOneChip(moveTopOrBottom, stepSize - 1, possibleFields, fieldsVisited);
     }
     return possibleFields;
@@ -280,8 +280,12 @@ public class Pitch implements Cloneable{
    * @param index the index of the field to be checked
    * @return boolean whether index is valid
    */
-  private boolean isValidField(int index) {
-    return index >= 0 && index < this.pitch.length && index != INVALID_FIELD && this.pitch[index][2] == EMPTY;
+  private boolean isValidField(int index, int stepSize) {
+    return index >= 0 && index < this.pitch.length && index != INVALID_FIELD;
+  }
+  
+  private boolean isFieldFullyOccupied(int index) {
+    return this.pitch[index][2] != EMPTY;
   }
   
   /**
@@ -372,11 +376,11 @@ public class Pitch implements Cloneable{
   }
 
   public double assessConfiguration(int player) {
-    return assesConfiguratiohforOnePlayer(player) - assesConfiguratiohforOnePlayer((player + 1) % 3) - assesConfiguratiohforOnePlayer((player + 2) % 3);
+    return (assesConfigurationforOnePlayer(player));// - assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3);
   }
   
-  private double assesConfiguratiohforOnePlayer(int player) {
-    double value = getScoreForPlayer(player) * 5.0;
+  private double assesConfigurationforOnePlayer(int player) {
+    double value = getScoreForPlayer(player) * 10.0;
     value += evaluateChipPositions(player);
     return value;
   }
@@ -388,7 +392,7 @@ public class Pitch implements Cloneable{
     for (int i = 0; i < allChips.size(); i++) {
       int index = allChips.get(i).x;
       Point coordinate = mapIndexToCoordinates(index);
-      value += getRelativeRow(coordinate, player); // / 6.0;
+      value += getRelativeRow(coordinate, player);
       if (isWinningField(coordinate, player)) value += 5000.0;
     }
     return value;
@@ -434,7 +438,7 @@ public class Pitch implements Cloneable{
     return row;
   }
   
-  private boolean isWinningField(Point coordinate, int player) {
+  public boolean isWinningField(Point coordinate, int player) {
     return getRelativeRow(coordinate, player) == 6 && coordinate.x % 2 == 0;
   }
   
