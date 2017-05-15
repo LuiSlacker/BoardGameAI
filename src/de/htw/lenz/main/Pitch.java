@@ -154,7 +154,7 @@ public class Pitch implements Cloneable{
    * @param player the player to increment the score for
    */
   private void incrementScore(int player) {
-    if (player > 0 && player < 3) this.score[player] += 1;
+    this.score[player] += 1;
   }
   
   /**
@@ -174,6 +174,14 @@ public class Pitch implements Cloneable{
    */
   private int getScoreForPlayer(int player) {
     return this.score[player];
+  }
+  
+  public void printScore() {
+    StringBuilder string = new StringBuilder();
+    string.append("player1: ").append(this.score[0])
+          .append("---- player2: ").append(this.score[1])
+          .append("---- player3: ").append(this.score[2]);
+    System.out.println(string.toString());
   }
   
   /**
@@ -380,7 +388,7 @@ public class Pitch implements Cloneable{
   }
   
   private double assesConfigurationforOnePlayer(int player) {
-    double value = getScoreForPlayer(player) * 10.0;
+    double value = getScoreForPlayer(player);
     value += evaluateChipPositions(player);
     return value;
   }

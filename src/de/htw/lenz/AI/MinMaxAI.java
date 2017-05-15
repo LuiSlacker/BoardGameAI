@@ -11,7 +11,7 @@ public class MinMaxAI implements GameAI{
   private int maximizingPlayer;
   private Move currentlyWisestMove;
   
-  private static int INITIAL_DEPTH = 4;
+  private static int INITIAL_DEPTH = 3;
 
   @Override
   public void start() {
@@ -29,6 +29,7 @@ public class MinMaxAI implements GameAI{
   }
   
   private double miniMax(int player, int originalDepth, int depth, double alpha, double beta) {
+//    this.pitch.printScore();
     if (player == maximizingPlayer) {
       return max(player, originalDepth, depth, alpha, beta);
     } else {

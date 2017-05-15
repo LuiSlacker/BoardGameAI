@@ -44,9 +44,14 @@ public class PitchUnitTest {
   
   @Test
   public void mapIndexToCoordinatesTest(){
+    assertEquals(2, Pitch.mapIndexToCoordinates(5).x);
+    assertEquals(2, Pitch.mapIndexToCoordinates(2).x);
+    assertEquals(0, Pitch.mapIndexToCoordinates(8).x);
+    
     assertEquals(2, Pitch.mapIndexToCoordinates(5).y);
     assertEquals(1, Pitch.mapIndexToCoordinates(2).y);
     assertEquals(3, Pitch.mapIndexToCoordinates(8).y);
+    
   }
   
   @Test
