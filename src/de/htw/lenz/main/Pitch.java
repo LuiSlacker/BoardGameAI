@@ -372,10 +372,15 @@ public class Pitch implements Cloneable{
   }
 
   public double assessConfiguration(int player) {
-    double value = getScoreForPlayer(player) * 5.0;;
+    return assesConfiguratiohforOnePlayer(player) - assesConfiguratiohforOnePlayer((player + 1) % 3) - assesConfiguratiohforOnePlayer((player + 2) % 3);
+  }
+  
+  private double assesConfiguratiohforOnePlayer(int player) {
+    double value = getScoreForPlayer(player) * 5.0;
     value += evaluateChipPositions(player);
     return value;
   }
+  
   
   private double evaluateChipPositions(int player) {
     double value = 0.0;
@@ -431,6 +436,10 @@ public class Pitch implements Cloneable{
   
   private boolean isWinningField(Point coordinate, int player) {
     return getRelativeRow(coordinate, player) == 6 && coordinate.x % 2 == 0;
+  }
+  
+  private int getNextPlayer(int player) {
+    return (player + 1) % 3;
   }
 
 }
