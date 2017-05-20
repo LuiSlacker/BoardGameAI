@@ -9,9 +9,9 @@ public class Main {
 	public static void main(String[] args) {
 		Thread t1 = new Thread(new Task("Luis", new MinMaxAI()));
 		t1.start();
-		Thread t2 = new Thread(new Task("Mike", new RandomAI()));
+		Thread t2 = new Thread(new Task("Mike", new MinMaxAI()));
 		t2.start();
-		Thread t3 = new Thread(new Task("Zoey", new RandomAI()));
+		Thread t3 = new Thread(new Task("Zoey", new MinMaxAI()));
 		t3.start();
 	}
 }

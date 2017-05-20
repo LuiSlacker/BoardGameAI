@@ -30,6 +30,7 @@ public class MinMaxAI implements GameAI{
   
   private double miniMax(int player, int originalDepth, int depth, double alpha, double beta) {
 //    this.pitch.printScore();
+    //System.out.printf(String.valueOf(player));
     if (player == maximizingPlayer) {
       return max(player, originalDepth, depth, alpha, beta);
     } else {
@@ -40,7 +41,8 @@ public class MinMaxAI implements GameAI{
   private double max(int player, int originalDepth, int depth, double alpha, double beta) {
     List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
     if (depth == 0 || possibleMoves.isEmpty()) {
-      return this.pitch.assessConfiguration(player);
+      System.out.printf("player: %s, depth: %s\n", player, originalDepth);
+      return this.pitch.assessConfiguration(maximizingPlayer);
     }
     double bestValue = alpha;
     for (Move move : possibleMoves) {
@@ -59,7 +61,9 @@ public class MinMaxAI implements GameAI{
   private double min(int player, int originalDepth, int depth, double alpha, double beta) {
     List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
     if (depth == 0 || possibleMoves.isEmpty()) {
-      return this.pitch.assessConfiguration(player);
+//      System.out.printf("player: %s, depth: %s", player, originalDepth);
+      System.out.println("BEM");
+      return this.pitch.assessConfiguration(maximizingPlayer);
     }
     double bestValue = beta;
     for (Move move : possibleMoves) {
