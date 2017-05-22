@@ -91,12 +91,14 @@ public class Pitch implements Cloneable{
    * No validation of move necessary since server only sends valid moves
    * 
    * @param move the move to be taken care of
+   * @return the player corresponding for the move
    */
-  public void moveChip(Move move) {
-      int fromIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
-      int toIndex  = mapCoordinatesToIndex(move.toX, move.toY);
-      int player = takeChip(fromIndex, false);
-      setChip(toIndex, player);
+  public int moveChip(Move move) {
+    int fromIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
+    int toIndex  = mapCoordinatesToIndex(move.toX, move.toY);
+    int player = takeChip(fromIndex, false);
+    setChip(toIndex, player);
+    return player;
   }
   
   /**
