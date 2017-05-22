@@ -9,9 +9,9 @@ public class Main {
 	public static void main(String[] args) {
 		Thread t1 = new Thread(new Task("Luis", new MinMaxAI()));
 		t1.start();
-		Thread t2 = new Thread(new Task("Mike", new MinMaxAI()));
+		Thread t2 = new Thread(new Task("Mike", new RandomAI()));
 		t2.start();
-		Thread t3 = new Thread(new Task("Zoey", new MinMaxAI()));
+		Thread t3 = new Thread(new Task("Zoey", new RandomAI()));
 		t3.start();
 	}
 }
@@ -28,7 +28,7 @@ final class Task implements Runnable {
 	
 	@Override
 	public void run() {
-		new Client(this.clientName, this.gameAI);
+		new Client(this.clientName, null, this.gameAI);
 	}
 	
 }

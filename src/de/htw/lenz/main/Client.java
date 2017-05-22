@@ -1,6 +1,5 @@
 package de.htw.lenz.main;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -18,17 +17,17 @@ public class Client {
 	private String clientName;
 	private int threadTimeout; 
 	private GameAI gameAI;
-	private static int ADDITIONAL_SLACK_TIME = 100;
+	private static int ADDITIONAL_SLACK_TIME = 300;
 	
 	private Pitch pitch;
 
-	public Client(String clientName, GameAI gameAI) {
+	public Client(String clientName, String host, GameAI gameAI) {
 		try {
 		    this.gameAI = gameAI;
 		    this.clientName = clientName;
 		    pitch = new Pitch();
 		    
-			networkClient = new NetworkClient(null, clientName, ImageIO.read(new File("glasses.png")));
+			networkClient = new NetworkClient(host, clientName, ImageIO.read(getClass().getResourceAsStream("glasses.png")));
 			timeLimitMillis = networkClient.getTimeLimitInSeconds() * 1000;
 			networkLatencyMillis = networkClient.getExpectedNetworkLatencyInMilliseconds();
 			threadTimeout = timeLimitMillis - (2 * networkLatencyMillis) - ADDITIONAL_SLACK_TIME;

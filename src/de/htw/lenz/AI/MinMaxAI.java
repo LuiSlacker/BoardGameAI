@@ -11,19 +11,20 @@ public class MinMaxAI implements GameAI{
   private int maximizingPlayer;
   private Move currentlyWisestMove;
   
-  private static int INITIAL_DEPTH = 3;
+  private static int INITIAL_DEPTH = 4;
 
   @Override
   public void start() {
     int depth = INITIAL_DEPTH;
-    while(true) {
+//    while(true) {
       getWisestMove(depth);
       System.out.println("Depth:" + depth);
-      depth += 3;
-    }
+//      depth += 1;
+//    }
   }
   
   public void getWisestMove(int depth){
+    System.out.println(this.maximizingPlayer);
     double bestValue = miniMax(maximizingPlayer, depth, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
     System.out.println(bestValue);
   }
@@ -48,6 +49,7 @@ public class MinMaxAI implements GameAI{
     for (Move move : possibleMoves) {
       this.pitch.moveChip(move);
       double childValue = miniMax(getNextPlayer(player), originalDepth, depth - 1, bestValue, beta);
+      if (depth == originalDepth) System.out.printf("%s, value %s\n", move, childValue);
       this.pitch.moveChipBack(move);
       if (childValue > bestValue) {
         bestValue = childValue;
@@ -55,14 +57,15 @@ public class MinMaxAI implements GameAI{
         if (depth == originalDepth) this.currentlyWisestMove = move;
       }
     }
+    if (depth == originalDepth) System.out.printf("move taken: %s", this.currentlyWisestMove);
+    
     return bestValue;
   }
   
   private double min(int player, int originalDepth, int depth, double alpha, double beta) {
     List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
     if (depth == 0 || possibleMoves.isEmpty()) {
-//      System.out.printf("player: %s, depth: %s", player, originalDepth);
-      System.out.println("BEM");
+      System.out.printf("player: %s, depth: %s\n", player, originalDepth);
       return this.pitch.assessConfiguration(maximizingPlayer);
     }
     double bestValue = beta;

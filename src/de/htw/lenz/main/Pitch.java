@@ -384,11 +384,11 @@ public class Pitch implements Cloneable{
   }
 
   public double assessConfiguration(int player) {
-    return assesConfigurationforOnePlayer(player);// - assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3);
+    return (1.5 * assesConfigurationforOnePlayer(player)) - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)) / 2);
   }
   
   private double assesConfigurationforOnePlayer(int player) {
-    double value = 5.0 * getScoreForPlayer(player);
+    double value = getScoreForPlayer(player);
     value += evaluateChipPositions(player);
     return value;
   }
@@ -400,8 +400,8 @@ public class Pitch implements Cloneable{
     for (int i = 0; i < allChips.size(); i++) {
       int index = allChips.get(i).x;
       Point coordinate = mapIndexToCoordinates(index);
-      value += getRelativeRow(coordinate, player);
-      if (isWinningField(coordinate, player)) value += 50.0;
+      value += getRelativeRow(coordinate, player) / 7.0;
+      if (isWinningField(coordinate, player)) value += 500.0;
     }
     return value;
   }
