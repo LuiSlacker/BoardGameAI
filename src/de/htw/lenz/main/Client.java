@@ -18,7 +18,6 @@ public class Client {
 	private int threadTimeout; 
 	private GameAI gameAI;
 	private static int ADDITIONAL_SLACK_TIME = 300;
-	private DynamicPlayerEnum players;
 	private Pitch pitch;
 
 	public Client(String clientName, String host, GameAI gameAI) {
@@ -26,7 +25,6 @@ public class Client {
 		    this.gameAI = gameAI;
 		    this.clientName = clientName;
 		    this.pitch = new Pitch();
-		    this.players = new DynamicPlayerEnum();
 		    
 			networkClient = new NetworkClient(host, clientName, ImageIO.read(getClass().getResourceAsStream("glasses.png")));
 			timeLimitMillis = networkClient.getTimeLimitInSeconds() * 1000;
@@ -43,11 +41,10 @@ public class Client {
 	
 	private void listenForMoves() {
 		while(true) {
-		    System.out.println(this.players);
 			Move receiveMove;
 			while ((receiveMove = networkClient.receiveMove()) != null) {
-			  int player = pitch.moveChip(receiveMove);
-			  this.players.addPlayer(player);
+			  int playerFromMove = pitch.moveChip(receiveMove);
+			  this.gameAI.observePlayers(playerFromMove);
             }
 			
 			gameAI.setPitch(deepClonePitch());

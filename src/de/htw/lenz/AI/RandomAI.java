@@ -29,5 +29,8 @@ public class RandomAI implements GameAI{
     this.player = player;
   }
 
+  @Override
+  public void observePlayers(int player) {}
+
 }
   

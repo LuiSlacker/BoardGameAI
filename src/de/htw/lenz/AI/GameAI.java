@@ -9,4 +9,5 @@ public interface GameAI {
   public void setPlayer(int player);
   public void start();
   public Move getMove();
+  public void observePlayers(int player);
 }
