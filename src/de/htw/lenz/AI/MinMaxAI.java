@@ -46,14 +46,14 @@ public class MinMaxAI implements GameAI{
   @Override
   public void start() {
     int depth = INITIAL_DEPTH;
-//    while(true) {
+    while(true) {
       getWisestMove(depth);
-//      depth += 1;
-//    }
+      System.out.println("depth" + depth + " done.");
+      depth += 1;
+    }
   }
   
   public void getWisestMove(int depth){
-    logger.info("getWisestMove" + this.pitch.printScore2());
     miniMax(maximizingPlayer, depth, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
   
@@ -66,41 +66,29 @@ public class MinMaxAI implements GameAI{
   }
   
   private int max(int player, int originalDepth, int depth, int alpha, int beta) {
-    logger.info("max - player: " + player + " depth: " + depth);
     List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
     if (depth == 0 || possibleMoves.isEmpty()) {
-      int value = this.pitch.assessConfiguration(maximizingPlayer);
-      logger.info(""+ value);
-      return value;
+      return this.pitch.assessConfiguration(maximizingPlayer);
     } else {
       int bestValue = alpha;
       for (Move move : possibleMoves) {
-        logger.info("---");
-        logger.info(this.pitch.printScore2());
         this.pitch.moveChip(move);
-        logger.info("chip moved");
-        logger.info(this.pitch.printScore2());
         int childValue = miniMax(this.players.getNextPlayer(player), originalDepth, depth - 1, bestValue, beta);
         this.pitch.moveChipBack(move);
-        logger.info(this.pitch.printScore2());
         if (childValue > bestValue) {
           bestValue = childValue;
           if (depth == originalDepth) this.currentlyWisestMove = move;
-          //if (bestValue >= beta) break;
+          if (bestValue >= beta) break;
         }
       }
-      logger.info("best Value: " + bestValue);
       return bestValue;
     }
   }
   
   private int min(int player, int originalDepth, int depth, int alpha, int beta) {
-    logger.info("min - player: " + player + " depth: " + depth);
     List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
     if (depth == 0 || possibleMoves.isEmpty()) {
-      int value = this.pitch.assessConfiguration(maximizingPlayer);
-      logger.info(""+ value);
-      return value;
+      return this.pitch.assessConfiguration(maximizingPlayer);
     } else {
       int bestValue = beta;
       for (Move move : possibleMoves) {
@@ -109,7 +97,7 @@ public class MinMaxAI implements GameAI{
         this.pitch.moveChipBack(move);
         if (childValue < bestValue) {
           bestValue = childValue;
-          //if (bestValue <= alpha) break;
+          if (bestValue <= alpha) break;
         }
       }
       return bestValue;

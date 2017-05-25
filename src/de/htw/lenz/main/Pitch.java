@@ -128,7 +128,6 @@ public class Pitch implements Cloneable{
         this.pitch[index][i] = EMPTY;
         if (AIMode && i > 0 && this.pitch[index][i-1] != player) {
           decrementScore(player);
-          System.out.println("decrementing");
         }
         break;
       };
@@ -149,7 +148,6 @@ public class Pitch implements Cloneable{
         this.pitch[index][i] = player;
         if (!AIMode  && i > 0 && this.pitch[index][i-1] != player) {
           incrementScore(player);
-          System.out.println("incrementing");
         }
         break;
       }
