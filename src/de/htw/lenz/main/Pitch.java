@@ -97,7 +97,7 @@ public class Pitch implements Cloneable{
     int fromIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
     int toIndex  = mapCoordinatesToIndex(move.toX, move.toY);
     int player = takeChip(fromIndex, false);
-    setChip(toIndex, player);
+    setChip(toIndex, player, false);
     return player;
   }
   
@@ -111,7 +111,7 @@ public class Pitch implements Cloneable{
     int fromIndex  = mapCoordinatesToIndex(move.toX, move.toY);
     int toIndex  = mapCoordinatesToIndex(move.fromX, move.fromY);
     int player = takeChip(fromIndex, true);
-    setChip(toIndex, player);
+    setChip(toIndex, player, true);
   }
   
   /**
@@ -126,7 +126,10 @@ public class Pitch implements Cloneable{
       if (this.pitch[index][i] != EMPTY) {
         player = this.pitch[index][i];
         this.pitch[index][i] = EMPTY;
-        if (AIMode && i > 0 && this.pitch[index][i-1] != player) decrementScore(player);
+        if (AIMode && i > 0 && this.pitch[index][i-1] != player) {
+          decrementScore(player);
+          System.out.println("decrementing");
+        }
         break;
       };
     }
@@ -140,11 +143,14 @@ public class Pitch implements Cloneable{
    * @param index index of the field (internal array representation) to set the chip
    * @param player player to set the chip for
    */
-  private void setChip(int index, int player) {
+  private void setChip(int index, int player, boolean AIMode) {
     for (int i = 0; i <= 2; i++) {
       if (this.pitch[index][i] == EMPTY) {
         this.pitch[index][i] = player;
-        if (i > 0 && this.pitch[index][i-1] != player) incrementScore(player);
+        if (!AIMode  && i > 0 && this.pitch[index][i-1] != player) {
+          incrementScore(player);
+          System.out.println("incrementing");
+        }
         break;
       }
     }
@@ -176,14 +182,6 @@ public class Pitch implements Cloneable{
    */
   private int getScoreForPlayer(int player) {
     return this.score[player];
-  }
-  
-  public void printScore() {
-    StringBuilder string = new StringBuilder();
-    string.append("player1: ").append(this.score[0])
-          .append("---- player2: ").append(this.score[1])
-          .append("---- player3: ").append(this.score[2]);
-    System.out.println(string.toString());
   }
   
   /**
@@ -385,27 +383,31 @@ public class Pitch implements Cloneable{
     return index - (2 * columnNr);
   }
 
-  public double assessConfiguration(int player) {
-    return (1.0 * assesConfigurationforOnePlayer(player));// - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)) / 2);
+  public int assessConfiguration(int player) {
+    return (assesConfigurationforOnePlayer(player));// - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)) / 2);
   }
   
-  private double assesConfigurationforOnePlayer(int player) {
-    double value = 10.0 * getScoreForPlayer(player);
+  private int assesConfigurationforOnePlayer(int player) {
+    int value = 1000 * getScoreForPlayer(player);
     value += evaluateChipPositions(player);
     return value;
   }
   
-  
-  private double evaluateChipPositions(int player) {
-    double value = 0.0;
+  private int evaluateChipPositions(int player) {
+    int value = 0;
     List<Point> allChips = findAllPlayersChips(player);
     for (int i = 0; i < allChips.size(); i++) {
       int index = allChips.get(i).x;
+      //value += allChips.get(i).y * 8; Evaluate Height of stack
       Point coordinate = mapIndexToCoordinates(index);
-      value += getRelativeRow(coordinate, player);// / 7.0;
-      if (isWinningField(coordinate, player)) value += 500.0;
+      value += 10 * getRelativeRow(coordinate, player);
+      if (isWinningField(coordinate, player)) value += 500;
     }
     return value;
+  }
+  
+  public String printScore2() {
+    return ("("+ this.score[0] + ", " + this.score[1] + ", " + this.score[2] + ")");
   }
   
   /**
@@ -452,8 +454,4 @@ public class Pitch implements Cloneable{
     return getRelativeRow(coordinate, player) == 6 && coordinate.x % 2 == 0;
   }
   
-  private int getNextPlayer(int player) {
-    return (player + 1) % 3;
-  }
-
 }

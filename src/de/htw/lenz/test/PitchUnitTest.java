@@ -86,14 +86,16 @@ public class PitchUnitTest {
     assertEquals(true, pitch.isWinningField(new Point(0, 1), PLAYER3));
     assertEquals(false, pitch.isWinningField(new Point(1, 6), PLAYER3));
     assertEquals(false, pitch.isWinningField(new Point(1, 2), PLAYER3));
+    assertEquals(false, pitch.isWinningField(new Point(1, 2), PLAYER3));
+    assertEquals(true, pitch.isWinningField(new Point(0, 3), PLAYER3));
   }
   
   @Test
   public void assessConfigurationTest() {
     Pitch pitch = new Pitch();
-    assertEquals(9.0, pitch.assessConfiguration(PLAYER1), 0);
+    assertEquals(90, pitch.assessConfiguration(PLAYER1), 0);
     pitch.moveChip(new Move(0, 1, 3, 3));
-    assertEquals(11.0, pitch.assessConfiguration(PLAYER1), 0);
+    assertEquals(110, pitch.assessConfiguration(PLAYER1), 0);
   }
 
 }

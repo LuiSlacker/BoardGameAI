@@ -41,6 +41,7 @@ public class Client {
 	
 	private void listenForMoves() {
 		while(true) {
+		    this.pitch.printScore2();
 			Move receiveMove;
 			while ((receiveMove = networkClient.receiveMove()) != null) {
 			  int playerFromMove = pitch.moveChip(receiveMove);
