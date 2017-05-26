@@ -1,6 +1,7 @@
 package de.htw.lenz.main;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -20,11 +21,11 @@ public class Client {
 	private static int ADDITIONAL_SLACK_TIME = 300;
 	private Pitch pitch;
 
-	public Client(String clientName, String host, GameAI gameAI) {
+	public Client(String clientName, String host, GameAI gameAI, Logger logger) {
 		try {
 		    this.gameAI = gameAI;
 		    this.clientName = clientName;
-		    this.pitch = new Pitch();
+		    this.pitch = new Pitch(logger);
 		    
 			networkClient = new NetworkClient(host, clientName, ImageIO.read(getClass().getResourceAsStream("glasses.png")));
 			timeLimitMillis = networkClient.getTimeLimitInSeconds() * 1000;

@@ -1,12 +1,8 @@
 package de.htw.lenz.AI;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
-import de.htw.lenz.main.CustomFormatter;
 import de.htw.lenz.main.DynamicPlayerEnum;
 import de.htw.lenz.main.Pitch;
 import lenz.htw.bogapr.Move;
@@ -16,44 +12,31 @@ public class MinMaxAI implements GameAI{
   private Pitch pitch;
   private int maximizingPlayer;
   private DynamicPlayerEnum players;
+  private Move currentlyWisestMoveTemp;
   private Move currentlyWisestMove;
   Logger logger;
   
-  private static int INITIAL_DEPTH = 1;
+  private static int INITIAL_DEPTH = 4;
   
-  public MinMaxAI() {
+  public MinMaxAI(Logger logger) {
+    this.logger = logger;
     this.players = new DynamicPlayerEnum();
-    logger = Logger.getLogger("MyLog");
-    FileHandler fh;
-    try {
-      // This block configure the logger with handler and formatter
-      fh = new FileHandler("/Users/petulantslacker/Desktop/log.log");
-      logger.addHandler(fh);
-      //System.setProperty("java.util.logging.SimpleFormatter.format",  "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
-      SimpleFormatter formatter = new CustomFormatter();
-      fh.setFormatter(formatter);
-       
-      // the following statement is used to log any messages
-      logger.info("Logger initialized!");
-       
-    } catch (SecurityException e) {
-        e.printStackTrace();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
   }
   
   @Override
   public void start() {
     int depth = INITIAL_DEPTH;
-    while(true) {
+//    while(true) {
       getWisestMove(depth);
-      System.out.println("depth" + depth + " done.");
-      depth += 1;
-    }
+      System.out.println("depth: " + depth + " done.");
+//      logger.info("depth: " + depth + " done.");
+      this.currentlyWisestMove = this.currentlyWisestMoveTemp;
+      //depth++;
+//    }
   }
   
-  public void getWisestMove(int depth){
+  public void getWisestMove(int depth) {
+//    logger.info("new search for player: " + maximizingPlayer + " - depth: " + depth + "----------------------------------------------");
     miniMax(maximizingPlayer, depth, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
   
@@ -66,41 +49,76 @@ public class MinMaxAI implements GameAI{
   }
   
   private int max(int player, int originalDepth, int depth, int alpha, int beta) {
-    List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
-    if (depth == 0 || possibleMoves.isEmpty()) {
-      return this.pitch.assessConfiguration(maximizingPlayer);
-    } else {
-      int bestValue = alpha;
-      for (Move move : possibleMoves) {
-        this.pitch.moveChip(move);
-        int childValue = miniMax(this.players.getNextPlayer(player), originalDepth, depth - 1, bestValue, beta);
-        this.pitch.moveChipBack(move);
-        if (childValue > bestValue) {
-          bestValue = childValue;
-          if (depth == originalDepth) this.currentlyWisestMove = move;
-          if (bestValue >= beta) break;
+//    logger.info("max");
+    if (depth > 0) {
+      List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
+      if (possibleMoves.isEmpty()) {
+        return this.pitch.assessConfiguration(maximizingPlayer);
+      } else {
+//        logger.info("---");
+        int bestValue = alpha;
+        for (Move move : possibleMoves) {
+//          logger.info("new for iteration");
+//          logger.info(this.pitch.printScore2());
+          this.pitch.moveChip(move);
+//          logger.info("chip moved");
+//          logger.info(this.pitch.printScore2());
+          int childValue = miniMax(this.players.getNextPlayer(player), originalDepth, depth - 1, bestValue, beta);
+//          logger.info("coming back up to max");
+          this.pitch.moveChipBack(move);
+//          logger.info("chip moved back");
+//          logger.info(this.pitch.printScore2());
+          if (childValue > bestValue) {
+            bestValue = childValue;
+            if (depth == originalDepth) {
+//              logger.info("setting wisest move " + move + "for player" + player);
+              this.currentlyWisestMoveTemp = move;
+            }
+            //if (bestValue >= beta) break;
+          }
         }
+//        String s = (depth == originalDepth) ? "bestValue taken for Move: " : "bestValue taken: "; 
+//        logger.info(s + bestValue);
+        return bestValue;
       }
-      return bestValue;
+    } else {
+      int value = this.pitch.assessConfiguration(maximizingPlayer);
+//      logger.info("leaf reached  - assessedValue: " + value);
+      return value;
     }
   }
   
   private int min(int player, int originalDepth, int depth, int alpha, int beta) {
-    List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
-    if (depth == 0 || possibleMoves.isEmpty()) {
-      return this.pitch.assessConfiguration(maximizingPlayer);
-    } else {
-      int bestValue = beta;
-      for (Move move : possibleMoves) {
-        this.pitch.moveChip(move);
-        int childValue = miniMax(this.players.getNextPlayer(player), originalDepth, depth - 1, alpha, bestValue);
-        this.pitch.moveChipBack(move);
-        if (childValue < bestValue) {
-          bestValue = childValue;
-          if (bestValue <= alpha) break;
+//    logger.info("min");
+    if (depth > 0) {
+      List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
+      if (possibleMoves.isEmpty()) {
+        return this.pitch.assessConfiguration(maximizingPlayer);
+      } else {
+//        logger.info("---");
+        int bestValue = beta;
+        for (Move move : possibleMoves) {
+//          logger.info("new for iteration");
+//          logger.info(this.pitch.printScore2());
+          this.pitch.moveChip(move);
+//          logger.info("chip moved");
+//          logger.info(this.pitch.printScore2());
+          int childValue = miniMax(this.players.getNextPlayer(player), originalDepth, depth - 1, alpha, bestValue);
+//          logger.info("coming back up to min");
+          this.pitch.moveChipBack(move);
+//          logger.info("chip moved back");
+//          logger.info(this.pitch.printScore2());
+          if (childValue < bestValue) {
+            bestValue = childValue;
+            //if (bestValue <= alpha) break;
+          }
         }
+        return bestValue;
       }
-      return bestValue;
+    } else {
+      int value = this.pitch.assessConfiguration(maximizingPlayer);
+//      logger.info("leaf reached  - assessedValue: " + value);
+      return value;
     }
   }
   

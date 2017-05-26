@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import lenz.htw.bogapr.Move;
 
@@ -25,8 +26,11 @@ public class Pitch implements Cloneable{
   private static final int PLAYER1 = 0;
   private static final int PLAYER2 = 1;
   private static final int PLAYER3 = 2;
+  
+  private Logger logger;
 
-  public Pitch() {
+  public Pitch(Logger logger) {
+    this.logger = logger;
     initializePitch();
   }
   
@@ -382,7 +386,7 @@ public class Pitch implements Cloneable{
   }
 
   public int assessConfiguration(int player) {
-    return (assesConfigurationforOnePlayer(player));// - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)) / 2);
+    return (1 * assesConfigurationforOnePlayer(player));// - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)) / 2);
   }
   
   private int assesConfigurationforOnePlayer(int player) {
@@ -393,14 +397,17 @@ public class Pitch implements Cloneable{
   
   private int evaluateChipPositions(int player) {
     int value = 0;
+    StringBuilder sb = new StringBuilder();
     List<Point> allChips = findAllPlayersChips(player);
     for (int i = 0; i < allChips.size(); i++) {
       int index = allChips.get(i).x;
-      //value += allChips.get(i).y * 8; Evaluate Height of stack
       Point coordinate = mapIndexToCoordinates(index);
-      value += 10 * getRelativeRow(coordinate, player);
-      if (isWinningField(coordinate, player)) value += 500;
+      int relativeRow = getRelativeRow(coordinate, player);
+      value += (10 * relativeRow);
+      if (isWinningField(coordinate, player)) value += 5000;
+      sb.append(relativeRow + ", ");
     }
+//    logger.info(sb.toString());
     return value;
   }
   
