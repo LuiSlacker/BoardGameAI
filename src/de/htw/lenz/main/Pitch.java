@@ -91,7 +91,7 @@ public class Pitch implements Cloneable{
   }
   
   /**
-   * Handles one move of a chip
+   * Handles one move of a chip<br/>
    * No validation of move necessary since server only sends valid moves
    * 
    * @param move the move to be taken care of
@@ -106,7 +106,7 @@ public class Pitch implements Cloneable{
   }
   
   /**
-   * Undoes a given move and decrements score if applicable
+   * Undoes a given move and decrements score if applicable.<br/>
    * This method is only called by the AI Algorithm
    * 
    * @param move the Move to be undone
@@ -386,7 +386,7 @@ public class Pitch implements Cloneable{
   }
 
   public int assessConfiguration(int player) {
-    return (1 * assesConfigurationforOnePlayer(player));// - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)) / 2);
+    return (2 * assesConfigurationforOnePlayer(player)) - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)));
   }
   
   private int assesConfigurationforOnePlayer(int player) {
@@ -439,7 +439,7 @@ public class Pitch implements Cloneable{
    * @param player the player to return the relative row for
    * @return the relative row for a given player
    */
-  public int getRelativeRow(Point coordinate, int player){
+  public static int getRelativeRow(Point coordinate, int player){
     int row = 0;
     switch (player) {
     case PLAYER1:
@@ -455,7 +455,7 @@ public class Pitch implements Cloneable{
     return row;
   }
   
-  public boolean isWinningField(Point coordinate, int player) {
+  public static boolean isWinningField(Point coordinate, int player) {
     return getRelativeRow(coordinate, player) == 6 && coordinate.x % 2 == 0;
   }
   
