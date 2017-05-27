@@ -20,12 +20,14 @@ public class Client {
 	private GameAI gameAI;
 	private static int ADDITIONAL_SLACK_TIME = 300;
 	private Pitch pitch;
+	private DynamicPlayerEnum players;
 
 	public Client(String clientName, String host, GameAI gameAI, Logger logger) {
 		try {
 		    this.gameAI = gameAI;
 		    this.clientName = clientName;
-		    this.pitch = new Pitch(logger);
+		    this.players = new DynamicPlayerEnum();
+		    this.pitch = new Pitch(players, logger);
 		    
 			networkClient = new NetworkClient(host, clientName, ImageIO.read(getClass().getResourceAsStream("glasses.png")));
 			timeLimitMillis = networkClient.getTimeLimitInSeconds() * 1000;
@@ -33,6 +35,7 @@ public class Client {
 			threadTimeout = timeLimitMillis - (2 * networkLatencyMillis) - ADDITIONAL_SLACK_TIME;
 			player = networkClient.getMyPlayerNumber();
 			gameAI.setPlayer(player);
+			gameAI.setPlayers(players);
 			
 			listenForMoves();
 	    } catch (IOException e) {
@@ -46,7 +49,7 @@ public class Client {
 			Move receiveMove;
 			while ((receiveMove = networkClient.receiveMove()) != null) {
 			  int playerFromMove = pitch.moveChip(receiveMove);
-			  this.gameAI.observePlayers(playerFromMove);
+			  this.players.observePlayers(playerFromMove);
             }
 			
 			gameAI.setPitch(deepClonePitch());
@@ -66,8 +69,8 @@ public class Client {
 	          calculationThread.stop();
             }
 			
-			System.out.printf("Sending move %s for %s", moveToSend, clientName);
-			System.out.println("----");
+//			System.out.printf("Sending move %s for %s", moveToSend, clientName);
+//			System.out.println("----");
 			networkClient.sendMove(moveToSend);
 		}
 	}

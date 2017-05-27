@@ -1,5 +1,6 @@
 package de.htw.lenz.AI;
 
+import de.htw.lenz.main.DynamicPlayerEnum;
 import de.htw.lenz.main.Pitch;
 import lenz.htw.bogapr.Move;
 
@@ -24,6 +25,6 @@ public class ErrorAI implements GameAI{
   }
 
   @Override
-  public void observePlayers(int player) {}
+  public void setPlayers(DynamicPlayerEnum players) {}
 
 }

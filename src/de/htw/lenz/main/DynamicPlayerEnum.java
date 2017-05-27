@@ -22,14 +22,27 @@ public class DynamicPlayerEnum {
   }
   
   public void observePlayers(int player) {
+    System.out.println("player: " + player);
+    System.out.println("prevplayer: " + this.previousPlayer);
+    System.out.println("size: " + this.players.size());
     if (this.players.size() == 3) {
       if (player == getSecondNextPlayer(this.previousPlayer)) {
-        this.players.remove(getNextPlayer(this.previousPlayer));
+        System.out.println("removing next player");
+        this.players.remove(getNextPlayerIndex(this.previousPlayer));
       } else if (player == this.previousPlayer ) {
-        this.players.remove(getNextPlayer(this.previousPlayer));
-        this.players.remove(getSecondNextPlayer(this.previousPlayer));
+        System.out.println("removing both");
+        int nextPlayer1 = getNextPlayerIndex(this.previousPlayer);
+        System.out.println(nextPlayer1);
+        this.players.remove(nextPlayer1);
+        int nextplayer2 = getNextPlayerIndex(this.previousPlayer);
+        System.out.println(nextplayer2);
+        this.players.remove(nextplayer2);
       }
-    } else if(this.players.size() == 2 && player == this.previousPlayer) this.players.remove(getNextPlayer(this.previousPlayer));
+    } else if(this.players.size() == 2 && player == this.previousPlayer) {
+      int nextPLayer = getNextPlayerIndex(this.previousPlayer);
+      System.out.println(nextPLayer);
+      this.players.remove(nextPLayer);
+    }
     this.previousPlayer = player;
   }
   
@@ -38,9 +51,17 @@ public class DynamicPlayerEnum {
     return this.players.get(nextPlayersIndex);
   }
   
+  public int getNextPlayerIndex(int player) {
+    return (this.players.indexOf(player) + 1) % this.players.size();
+  }
+  
   public int getSecondNextPlayer(int player) {
     int secondNextPlayersIndex = (this.players.indexOf(player) + 2) % this.players.size();
     return this.players.get(secondNextPlayersIndex);
+  }
+  
+  public int getLength() {
+    return this.players.size();
   }
   
   @Override

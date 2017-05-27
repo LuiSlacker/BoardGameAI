@@ -1,5 +1,6 @@
 package de.htw.lenz.AI;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,7 +21,6 @@ public class MinMaxAI implements GameAI{
   
   public MinMaxAI(Logger logger) {
     this.logger = logger;
-    this.players = new DynamicPlayerEnum();
   }
   
   @Override
@@ -28,7 +28,7 @@ public class MinMaxAI implements GameAI{
     int depth = INITIAL_DEPTH;
     while(true) {
       getWisestMove(depth);
-      System.out.println("depth: " + depth + " done.");
+//      System.out.println("depth: " + depth + " done.");
 //      logger.info("depth: " + depth + " done.");
       this.currentlyWisestMove = this.currentlyWisestMoveTemp;
       depth++;
@@ -36,7 +36,7 @@ public class MinMaxAI implements GameAI{
   }
   
   public void getWisestMove(int depth) {
-    logger.info("new search for player: " + maximizingPlayer + " - depth: " + depth + "----------------------------------------------");
+//    logger.info("new search for player: " + maximizingPlayer + " - depth: " + depth + "----------------------------------------------");
     miniMax(maximizingPlayer, depth, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
   
@@ -55,8 +55,9 @@ public class MinMaxAI implements GameAI{
       if (possibleMoves.isEmpty()) {
         return this.pitch.assessConfiguration(maximizingPlayer);
       } else {
-        logger.info("---");
+//        logger.info("---");
         int bestValue = alpha;
+        Collections.shuffle(possibleMoves);
         for (Move move : possibleMoves) {
 //          logger.info("new for iteration");
 //          logger.info(this.pitch.printScore2());
@@ -77,13 +78,13 @@ public class MinMaxAI implements GameAI{
             if (bestValue >= beta) break;
           }
         }
-        String s = (depth == originalDepth) ? "bestValue taken for Move: " : "bestValue taken: "; 
-        logger.info(s + bestValue);
+//        String s = (depth == originalDepth) ? "bestValue taken for Move: " : "bestValue taken: "; 
+//        logger.info(s + bestValue);
         return bestValue;
       }
     } else {
       int value = this.pitch.assessConfiguration(maximizingPlayer);
-      logger.info("leaf reached  - assessedValue: " + value);
+//      logger.info("leaf reached  - assessedValue: " + value);
       return value;
     }
   }
@@ -97,6 +98,7 @@ public class MinMaxAI implements GameAI{
       } else {
 //        logger.info("---");
         int bestValue = beta;
+        Collections.shuffle(possibleMoves);
         for (Move move : possibleMoves) {
 //          logger.info("new for iteration");
 //          logger.info(this.pitch.printScore2());
@@ -117,7 +119,7 @@ public class MinMaxAI implements GameAI{
       }
     } else {
       int value = this.pitch.assessConfiguration(maximizingPlayer);
-      logger.info("leaf reached  - assessedValue: " + value);
+//      logger.info("leaf reached  - assessedValue: " + value);
       return value;
     }
   }
@@ -138,8 +140,8 @@ public class MinMaxAI implements GameAI{
   }
   
   @Override
-  public void observePlayers(int player) {
-    this.players.observePlayers(player);
+  public void setPlayers(DynamicPlayerEnum players) {
+    this.players = players;
   }
 
 }

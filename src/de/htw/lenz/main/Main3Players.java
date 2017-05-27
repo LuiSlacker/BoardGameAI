@@ -5,6 +5,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import de.htw.lenz.AI.ErrorAI;
 import de.htw.lenz.AI.GameAI;
 import de.htw.lenz.AI.MinMaxAI;
 import de.htw.lenz.AI.RandomAI;
@@ -33,9 +34,9 @@ public class Main3Players {
 	    }
 		Thread t1 = new Thread(new Task("Luis", new MinMaxAI(logger), logger));
 		t1.start();
-		Thread t2 = new Thread(new Task("Mike", new MinMaxAI(logger), logger));
+		Thread t2 = new Thread(new Task("Mike", new ErrorAI(), logger));
 		t2.start();
-		Thread t3 = new Thread(new Task("Zoey", new MinMaxAI(logger), logger));
+		Thread t3 = new Thread(new Task("Zoey", new ErrorAI(), logger));
 		t3.start();
 	}
 }

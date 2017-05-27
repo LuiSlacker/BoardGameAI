@@ -27,10 +27,13 @@ public class Pitch implements Cloneable{
   private static final int PLAYER2 = 1;
   private static final int PLAYER3 = 2;
   
+  private DynamicPlayerEnum players;
+  
   private Logger logger;
 
-  public Pitch(Logger logger) {
+  public Pitch(DynamicPlayerEnum players, Logger logger) {
     this.logger = logger;
+    this.players = players;
     initializePitch();
   }
   
@@ -386,7 +389,17 @@ public class Pitch implements Cloneable{
   }
 
   public int assessConfiguration(int player) {
-    return (2 * assesConfigurationforOnePlayer(player)) - ((assesConfigurationforOnePlayer((player + 1) % 3) - assesConfigurationforOnePlayer((player + 2) % 3)));
+    int value;
+    if (this.players.getLength() == 3) {
+      value = (3 * assesConfigurationforOnePlayer(player))
+          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player))
+          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player));
+    } else if (this.players.getLength() == 2) {
+      value = (2 * assesConfigurationforOnePlayer(player))
+          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player));
+    } else value = assesConfigurationforOnePlayer(player);
+    return value;
+        
   }
   
   private int assesConfigurationforOnePlayer(int player) {
@@ -397,17 +410,21 @@ public class Pitch implements Cloneable{
   
   private int evaluateChipPositions(int player) {
     int value = 0;
-    StringBuilder sb = new StringBuilder();
     List<Point> allChips = findAllPlayersChips(player);
     for (int i = 0; i < allChips.size(); i++) {
       int index = allChips.get(i).x;
       Point coordinate = mapIndexToCoordinates(index);
+      
       int relativeRow = getRelativeRow(coordinate, player);
-      value += (10 * relativeRow);
-      if (isWinningField(coordinate, player)) value += 5000;
-      sb.append(relativeRow + ", ");
+      value += 10 * relativeRow;
+      
+      // make sure maximizing player has highest score when evaluating winning position
+      if (isWinningField(coordinate, player)) {
+        value += (this.score[player] + 5 > this.score[(player + 1) % 3] && this.score[player] + 5 > this.score[(player + 2) % 3])
+            ? 5000
+            : -5000;
+      }
     }
-//    logger.info(sb.toString());
     return value;
   }
   

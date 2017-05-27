@@ -1,5 +1,6 @@
 package de.htw.lenz.AI;
 
+import de.htw.lenz.main.DynamicPlayerEnum;
 import de.htw.lenz.main.Pitch;
 import lenz.htw.bogapr.Move;
 
@@ -9,5 +10,5 @@ public interface GameAI {
   public void setPlayer(int player);
   public void start();
   public Move getMove();
-  public void observePlayers(int player);
+  public void setPlayers(DynamicPlayerEnum players);
 }
