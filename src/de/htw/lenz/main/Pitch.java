@@ -29,10 +29,7 @@ public class Pitch implements Cloneable{
   
   private DynamicPlayerEnum players;
   
-  private Logger logger;
-
-  public Pitch(DynamicPlayerEnum players, Logger logger) {
-    this.logger = logger;
+  public Pitch(DynamicPlayerEnum players) {
     this.players = players;
     initializePitch();
   }

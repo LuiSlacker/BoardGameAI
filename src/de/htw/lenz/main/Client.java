@@ -15,19 +15,17 @@ public class Client {
 	private int networkLatencyMillis;
 	private int timeLimitMillis;
 	private int player;
-	private String clientName;
 	private int threadTimeout; 
 	private GameAI gameAI;
 	private static int ADDITIONAL_SLACK_TIME = 300;
 	private Pitch pitch;
 	private DynamicPlayerEnum players;
 
-	public Client(String clientName, String host, GameAI gameAI, Logger logger) {
+	public Client(String clientName, String host, GameAI gameAI) {
 		try {
 		    this.gameAI = gameAI;
-		    this.clientName = clientName;
 		    this.players = new DynamicPlayerEnum();
-		    this.pitch = new Pitch(players, logger);
+		    this.pitch = new Pitch(players);
 		    
 			networkClient = new NetworkClient(host, clientName, ImageIO.read(getClass().getResourceAsStream("glasses.png")));
 			timeLimitMillis = networkClient.getTimeLimitInSeconds() * 1000;
