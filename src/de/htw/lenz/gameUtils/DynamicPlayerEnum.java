@@ -1,4 +1,4 @@
-package de.htw.lenz.main;
+package de.htw.lenz.gameUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package de.htw.lenz.main;
+package de.htw.lenz.gameUtils;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.htw.lenz.utils.Utils;
 import lenz.htw.bogapr.Move;
 
 /**

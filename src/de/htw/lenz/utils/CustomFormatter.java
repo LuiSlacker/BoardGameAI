@@ -1,4 +1,4 @@
-package de.htw.lenz.main;
+package de.htw.lenz.utils;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

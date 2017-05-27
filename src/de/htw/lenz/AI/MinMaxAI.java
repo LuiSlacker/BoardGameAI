@@ -3,8 +3,8 @@ package de.htw.lenz.AI;
 import java.util.Collections;
 import java.util.List;
 
-import de.htw.lenz.main.DynamicPlayerEnum;
-import de.htw.lenz.main.Pitch;
+import de.htw.lenz.gameUtils.DynamicPlayerEnum;
+import de.htw.lenz.gameUtils.Pitch;
 import lenz.htw.bogapr.Move;
 
 public class MinMaxAI implements GameAI{

@@ -3,6 +3,7 @@ package de.htw.lenz.main;
 import de.htw.lenz.AI.GameAI;
 import de.htw.lenz.AI.MinMaxAI;
 import de.htw.lenz.AI.RandomAI;
+import de.htw.lenz.gameUtils.Client;
 
 public class Main3Players {
   

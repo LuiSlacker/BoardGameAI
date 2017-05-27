@@ -2,7 +2,8 @@ package de.htw.lenz.test;
 
 import org.junit.Test;
 
-import de.htw.lenz.main.DynamicPlayerEnum;
+import de.htw.lenz.gameUtils.DynamicPlayerEnum;
+
 import static org.junit.Assert.assertEquals;
 
 public class DynamicPlayerEnumTest {
