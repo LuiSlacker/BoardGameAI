@@ -2,7 +2,6 @@ package de.htw.lenz.AI;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import de.htw.lenz.main.DynamicPlayerEnum;
 import de.htw.lenz.main.Pitch;
@@ -18,21 +17,37 @@ public class MinMaxAI implements GameAI{
   
   private static int INITIAL_DEPTH = 3;
   
+  /**
+   * Triggers the incremental search for a best move
+   */
   @Override
   public void start() {
     int depth = INITIAL_DEPTH;
     while(true) {
       getWisestMove(depth);
-//      System.out.println("depth: " + depth + " done.");
+      System.out.println("depth: " + depth + " done.");
       this.currentlyWisestMove = this.currentlyWisestMoveTemp;
       depth++;
     }
   }
   
+  /**
+   * Initial recursive call
+   * @param depth the depth for the tree to be calculated
+   */
   public void getWisestMove(int depth) {
     miniMax(maximizingPlayer, depth, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
   
+  /**
+   * Recursive wrapper to call the corresponding function(min or max) for each player
+   * @param player
+   * @param originalDepth
+   * @param depth
+   * @param alpha
+   * @param beta
+   * @return
+   */
   private int miniMax(int player, int originalDepth, int depth, int alpha, int beta) {
     if (player == maximizingPlayer) {
       return max(player, originalDepth, depth, alpha, beta);
@@ -41,6 +56,15 @@ public class MinMaxAI implements GameAI{
     }
   }
   
+  /**
+   * Recursive function for the maximizing player
+   * @param player
+   * @param originalDepth
+   * @param depth
+   * @param alpha
+   * @param beta
+   * @return
+   */
   private int max(int player, int originalDepth, int depth, int alpha, int beta) {
     if (depth > 0) {
       List<Move> possibleMoves = this.pitch.getPossibleMoves(player);
@@ -66,6 +90,15 @@ public class MinMaxAI implements GameAI{
     } else return this.pitch.assessConfiguration(maximizingPlayer);
   }
   
+  /**
+   * Recursive function for the minimizing player
+   * @param player
+   * @param originalDepth
+   * @param depth
+   * @param alpha
+   * @param beta
+   * @return
+   */
   private int min(int player, int originalDepth, int depth, int alpha, int beta) {
     if (depth > 0) {
       List<Move> possibleMoves = this.pitch.getPossibleMoves(player);

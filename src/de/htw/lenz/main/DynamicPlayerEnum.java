@@ -22,25 +22,17 @@ public class DynamicPlayerEnum {
   }
   
   public void observePlayers(int player) {
-    System.out.println("player: " + player);
-    System.out.println("prevplayer: " + this.previousPlayer);
-    System.out.println("size: " + this.players.size());
     if (this.players.size() == 3) {
       if (player == getSecondNextPlayer(this.previousPlayer)) {
-        System.out.println("removing next player");
         this.players.remove(getNextPlayerIndex(this.previousPlayer));
       } else if (player == this.previousPlayer ) {
-        System.out.println("removing both");
         int nextPlayer1 = getNextPlayerIndex(this.previousPlayer);
-        System.out.println(nextPlayer1);
         this.players.remove(nextPlayer1);
         int nextplayer2 = getNextPlayerIndex(this.previousPlayer);
-        System.out.println(nextplayer2);
         this.players.remove(nextplayer2);
       }
     } else if(this.players.size() == 2 && player == this.previousPlayer) {
       int nextPLayer = getNextPlayerIndex(this.previousPlayer);
-      System.out.println(nextPLayer);
       this.players.remove(nextPLayer);
     }
     this.previousPlayer = player;

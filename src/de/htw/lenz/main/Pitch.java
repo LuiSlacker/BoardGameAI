@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import lenz.htw.bogapr.Move;
 
@@ -320,6 +319,79 @@ public class Pitch implements Cloneable{
     return possibleMoves;
   }
   
+  /**
+   * Returns all chips for a given player
+   * 
+   * @return all chips for a given player
+   */
+  private List<Point> findAllPlayersChips(int player) {
+    List<Point> allChips = new ArrayList<>();
+    for (int i = 0; i < pitch.length; i++) {
+      for (int j = 0; j < 3; j++) {
+        if (this.pitch[i][j] == player) {
+          allChips.add(new Point(i, j));
+        }
+      }
+    }
+    return allChips;
+  }
+  
+  /**
+   * Assess configuration for a given player subtracted by the other players configurations
+   * @param player
+   * @return
+   */
+  public int assessConfiguration(int player) {
+    int value;
+    if (this.players.getLength() == 3) {
+      value = (3 * assesConfigurationforOnePlayer(player))
+          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player))
+          - assesConfigurationforOnePlayer(this.players.getSecondNextPlayer(player));
+    } else if (this.players.getLength() == 2) {
+      value = (2 * assesConfigurationforOnePlayer(player))
+          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player));
+    } else value = assesConfigurationforOnePlayer(player);
+    return value;
+        
+  }
+  
+  /**
+   * Assesses the configuration for a given player
+   * @param player
+   * @return
+   */
+  private int assesConfigurationforOnePlayer(int player) {
+    int value = 1000 * getScoreForPlayer(player);
+    value += evaluateChipPositions(player);
+    return value;
+  }
+  
+  /**
+   * Evaluates all chips for a given player
+   * @param player
+   * @return
+   */
+  private int evaluateChipPositions(int player) {
+    int value = 0;
+    List<Point> allChips = findAllPlayersChips(player);
+    for (int i = 0; i < allChips.size(); i++) {
+      int index = allChips.get(i).x;
+      Point coordinate = mapIndexToCoordinates(index);
+      
+      // Honor higher relative rows
+      int relativeRow = getRelativeRow(coordinate, player);
+      value += 10 * relativeRow;
+      
+      // make sure maximizing player has highest score when evaluating winning position
+      if (isWinningField(coordinate, player)) {
+        value += (this.score[player] + 5 > this.score[(player + 1) % 3] && this.score[player] + 5 > this.score[(player + 2) % 3])
+            ? 5000
+            : -5000;
+      }
+    }
+    return value;
+  }
+  
   
   /***************************************************************************************************************
    ** STATIC METHODS
@@ -385,66 +457,6 @@ public class Pitch implements Cloneable{
     return index - (2 * columnNr);
   }
 
-  public int assessConfiguration(int player) {
-    int value;
-    if (this.players.getLength() == 3) {
-      value = (3 * assesConfigurationforOnePlayer(player))
-          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player))
-          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player));
-    } else if (this.players.getLength() == 2) {
-      value = (2 * assesConfigurationforOnePlayer(player))
-          - assesConfigurationforOnePlayer(this.players.getNextPlayer(player));
-    } else value = assesConfigurationforOnePlayer(player);
-    return value;
-        
-  }
-  
-  private int assesConfigurationforOnePlayer(int player) {
-    int value = 1000 * getScoreForPlayer(player);
-    value += evaluateChipPositions(player);
-    return value;
-  }
-  
-  private int evaluateChipPositions(int player) {
-    int value = 0;
-    List<Point> allChips = findAllPlayersChips(player);
-    for (int i = 0; i < allChips.size(); i++) {
-      int index = allChips.get(i).x;
-      Point coordinate = mapIndexToCoordinates(index);
-      
-      int relativeRow = getRelativeRow(coordinate, player);
-      value += 10 * relativeRow;
-      
-      // make sure maximizing player has highest score when evaluating winning position
-      if (isWinningField(coordinate, player)) {
-        value += (this.score[player] + 5 > this.score[(player + 1) % 3] && this.score[player] + 5 > this.score[(player + 2) % 3])
-            ? 5000
-            : -5000;
-      }
-    }
-    return value;
-  }
-  
-  public String printScore2() {
-    return ("("+ this.score[0] + ", " + this.score[1] + ", " + this.score[2] + ")");
-  }
-  
-  /**
-   * Returns all chips for a given player
-   * 
-   * @return all chips for a given player
-   */
-  private List<Point> findAllPlayersChips(int player) {
-    List<Point> allChips = new ArrayList<>();
-    for (int i = 0; i < pitch.length; i++) {
-      for (int j = 0; j < 3; j++) {
-        if (this.pitch[i][j] == player) {
-          allChips.add(new Point(i, j));
-        }
-      }
-    }
-    return allChips;
-  }
   
   /**
    * Returns the relative row(1-6) for a given player
@@ -469,6 +481,12 @@ public class Pitch implements Cloneable{
     return row;
   }
   
+  /**
+   * Returns whether coordinate is a winning field for a given payer
+   * @param coordinate
+   * @param player
+   * @return
+   */
   public static boolean isWinningField(Point coordinate, int player) {
     return getRelativeRow(coordinate, player) == 6 && coordinate.x % 2 == 0;
   }

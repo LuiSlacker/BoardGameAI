@@ -1,7 +1,6 @@
 package de.htw.lenz.main;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -17,7 +16,7 @@ public class Client {
 	private int player;
 	private int threadTimeout; 
 	private GameAI gameAI;
-	private static int ADDITIONAL_SLACK_TIME = 300;
+	private static int ADDITIONAL_SLACK_TIME = 400;
 	private Pitch pitch;
 	private DynamicPlayerEnum players;
 
@@ -43,32 +42,32 @@ public class Client {
 	
 	private void listenForMoves() {
 		while(true) {
-		    this.pitch.printScore2();
 			Move receiveMove;
 			while ((receiveMove = networkClient.receiveMove()) != null) {
 			  int playerFromMove = pitch.moveChip(receiveMove);
 			  this.players.observePlayers(playerFromMove);
             }
 			
+			/** Calculate best Move **/
 			gameAI.setPitch(deepClonePitch());
 			AIRunnable aiRunnable = new AIRunnable(gameAI);
 			Thread calculationThread = new Thread(aiRunnable);
 			calculationThread.start();
 			
-			Move moveToSend;
+			// Initialize moveToSend with a random Move
+			Move moveToSend = this.pitch.getRandomMove(player);
 			try {
 	          Thread.sleep(threadTimeout);
+	          // once the time for calculation is reached, retrieve the currently best Move from AI
 	          moveToSend = aiRunnable.getMove();
 	        } catch (InterruptedException e) {
 	          moveToSend = this.pitch.getRandomMove(player);
 	          System.out.printf("AI-Thread Exception %s", player);
 	        } finally {
-	          // TODO replace deprecated Thread.stop();
+	          // Stops the running Thread
 	          calculationThread.stop();
             }
 			
-//			System.out.printf("Sending move %s for %s", moveToSend, clientName);
-//			System.out.println("----");
 			networkClient.sendMove(moveToSend);
 		}
 	}
@@ -85,6 +84,10 @@ public class Client {
 
 }
 
+/**
+ * Runnable for the AI-Calculation Thread
+ *
+ */
 final class AIRunnable implements Runnable {
   
   private GameAI gameAI;
