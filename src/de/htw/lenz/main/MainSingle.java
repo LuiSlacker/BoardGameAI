@@ -10,8 +10,7 @@ import de.htw.lenz.gameUtils.Client;
 public class MainSingle {
 
   public static void main(String[] args) {
-    if (args.length <1) throw new Error("no host provided");
-    if (args[0] == null) new Client("Luis", null, new MinMaxAI());
+    if (args.length < 1) throw new Error("no host provided");
     new Client("Luis", args[0], new MinMaxAI());
   }
 

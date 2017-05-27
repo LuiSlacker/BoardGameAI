@@ -323,7 +323,8 @@ public class Pitch implements Cloneable{
   /**
    * Returns all chips for a given player
    * 
-   * @return all chips for a given player
+   * @return all chips for a given player as Points <br/>
+   *         whereby the x coordinate reflects the index of the pitch and y the height of the stack
    */
   private List<Point> findAllPlayersChips(int player) {
     List<Point> allChips = new ArrayList<>();
@@ -377,20 +378,39 @@ public class Pitch implements Cloneable{
     List<Point> allChips = findAllPlayersChips(player);
     for (int i = 0; i < allChips.size(); i++) {
       int index = allChips.get(i).x;
+      int stackPosition = allChips.get(i).y;
       Point coordinate = mapIndexToCoordinates(index);
       
       // Honor higher relative rows
       int relativeRow = getRelativeRow(coordinate, player);
       value += 10 * relativeRow;
       
+      // Honor higher position in stacks
+      value += stackPosition * 7;
+      
       // make sure maximizing player has highest score when evaluating winning position
       if (isWinningField(coordinate, player)) {
-        value += (this.score[player] + 5 > this.score[(player + 1) % 3] && this.score[player] + 5 > this.score[(player + 2) % 3])
-            ? 5000
-            : -5000;
+        boolean b = wouldWinningFieldReallyWin(player);
+        if (b) {
+          value += 5000;
+        } else {
+          value -= 5000;
+        }
       }
     }
     return value;
+  }
+  
+  /**
+   * See if a Move to a winning field would result in the maximizing player to win
+   */
+  public boolean wouldWinningFieldReallyWin(int player) {
+    return this.score[player] > this.score[(player + 1) % 3]
+        && this.score[player] > this.score[(player + 2) % 3];
+  }
+  
+  public void printScore() {
+    System.out.println("(" + this.score[0] +", " + this.score[1] + ", " + this.score[2] +")" );
   }
   
   

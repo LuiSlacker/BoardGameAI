@@ -1,5 +1,6 @@
 package de.htw.lenz.AI;
 
+import java.awt.Point;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,7 +83,8 @@ public class MinMaxAI implements GameAI{
             if (depth == originalDepth) {
               this.currentlyWisestMoveTemp = move;
             }
-            if (bestValue >= beta) break;
+            if (bestValue >= beta
+            || (Pitch.isWinningField(new Point(move.toX,  move.toY), maximizingPlayer) && this.pitch.wouldWinningFieldReallyWin(maximizingPlayer))) break;
           }
         }
         return bestValue;
